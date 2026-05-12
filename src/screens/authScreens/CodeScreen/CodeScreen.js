@@ -31,7 +31,7 @@ export default function CodeScreen({ navigation }) {
 
     const [focused, setFocused] = useState("");
 
-    const { setCodeScreen, user, token } = useAuthStore();
+    const { setCodeScreen, clearKeychainData, clearLocalAuth, user, token } = useAuthStore();
     const { profile } = useUserStore();
     const {
         control,
@@ -47,6 +47,8 @@ export default function CodeScreen({ navigation }) {
         try {
             const res = await GetEmployeeAppRouteList({ code: data?.schoolCode })
             if (res?.data?.status) {
+                await clearLocalAuth()
+                await clearKeychainData()
                 const apiList = res?.data?.data?.api_list || [];
                 const assetsApiList = res?.data?.data?.asset_list || [];
                 setAssetRoutes(assetsApiList)

@@ -27,8 +27,8 @@ export const AttCheckin = async (body) => {
 export const GetEmployeeAttendanceHistory = async (body) => {
     try {
         const { routes } = useApiRoutesStore.getState();
-        const response = await api.post( "https://www.urschooling.com/sms_n/qvms/sms_employee_n/api/get_employee_attendance_history", body);
-        // const response = await api.post( routes?.get_employee_attendance_history, body);
+        // const response = await api.post( "https://www.urschooling.com/sms_n/qvms/sms_employee_n/api/get_employee_attendance_history", body);
+        const response = await api.post( routes?.get_employee_attendance_history, body);
         return response
     } catch (error) { 
         console.error(error);
@@ -37,8 +37,8 @@ export const GetEmployeeAttendanceHistory = async (body) => {
 export const GetEmployeeAttendanceHistoryDetails = async (body) => {
     try {
         const { routes } = useApiRoutesStore.getState();
-        const response = await api.post( "https://www.urschoo÷ling.com/sms_n/qvms/sms_employee_n/api/get_employee_attendance_history_details", body);
-    //   const response = await api.post( routes?.get_employee_attendance_history_details, body);
+        // const response = await api.post( "https://www.urschoo÷ling.com/sms_n/qvms/sms_employee_n/api/get_employee_attendance_history_details", body);
+      const response = await api.post( routes?.get_employee_attendance_history_details, body);
         return response
     } catch (error) { 
         console.error(error);

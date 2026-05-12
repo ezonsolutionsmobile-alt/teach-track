@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Alert, Modal } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -248,7 +248,17 @@ export default function LoginScreen({ navigation }) {
         }
     };
 
-    console.log(isEnabled, "isEnabledisEnabledisEnabledisEnabledisEnabledisEnabled")
+  useEffect(() => {
+        const checkBiometric = async () => {
+            const isBiometric = await AsyncStorage.getItem(STORAGE_KEY);
+
+            if (isBiometric) {
+                handleBiometricLogin();
+            }
+        };
+
+        checkBiometric();
+    }, []);
     return (
         <AuthScreenWrapper backgroundImage={bg_image} backgroundPattern={bg_pattern}>
             {/* Error Modal */}
