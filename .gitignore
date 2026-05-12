@@ -1,0 +1,45 @@
+# Node Modules
+node_modules/
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/.idea/
+android/app/.cxx/
+android/*.iml
+android/local.properties
+*.keystore
+!debug.keystore
+
+# iOS
+ios/Pods/
+ios/build/
+ios/*.xcworkspace
+ios/*.xcuserstate
+
+# Ruby / Vendor
+vendor/
+
+# React Native builds
+*.apk
+*.aab
+*.bundle
+*.log
+
+# Metro / Cache
+.metro-cache/
+.watchmanconfig
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Env files
+.env
+.env.*
+
+# Extra
+coverage/
+*.tmp
+*.swp

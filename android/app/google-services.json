@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "665102741327",
+    "project_id": "employee-app-21c04",
+    "storage_bucket": "employee-app-21c04.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:665102741327:android:b94f7b8e36930707619f3a",
+        "android_client_info": {
+          "package_name": "com.urschooling.sms.employeeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCD-BZTP06brZfvP5A1bA0QBZXdm6-rBM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
