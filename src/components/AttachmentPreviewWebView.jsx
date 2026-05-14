@@ -15,7 +15,7 @@ import { CloseIcon } from '../assets/Icons';
 import themes from '../themes/colors';
 import Pdf from 'react-native-pdf';
 import RNFetchBlob from 'react-native-blob-util';
-import { moderateScale } from '../themes/sizes';
+import { moderateScale, verticalScale } from '../themes/sizes';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AttachmentPreviewWebView({
@@ -98,7 +98,8 @@ export default function AttachmentPreviewWebView({
                 <StatusBar barStyle="dark-content" backgroundColor={themes.white} />
 
                 {/* Header */}
-                <View style={styles.headerContainer}>
+                <View style={[styles.headerContainer,
+                { height: Platform.OS === 'android' && 50, paddingTop: Platform.OS == 'ios' && verticalScale(50) }]}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                         <TouchableOpacity onPress={onClose} style={styles.headerButton}>
                             <CloseIcon width={24} height={24} color={themes.darkText} />
@@ -168,12 +169,12 @@ export default function AttachmentPreviewWebView({
 
 const styles = StyleSheet.create({
     headerContainer: {
-        height: 50,
+
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 12,
-        borderBottomWidth: 1,
+        borderBottomWidth: 1, 
         borderBottomColor: '#ddd',
         backgroundColor: themes.white,
     },

@@ -91,7 +91,7 @@ export default function CustomDrawerContent({ navigation }) {
       ],
     });
   };
-  console.log(activeTab, "aksjkjhad", lastHomeScreen, "ahgsdjkjskjdhakjshd", activeRoute, "activeRoute",itemData?.type)
+  // console.log(activeTab, "aksjkjhad", lastHomeScreen, "ahgsdjkjskjdhakjshd", activeRoute, "activeRoute",itemData?.type)
   return (
 
     <View style={styles.container}>

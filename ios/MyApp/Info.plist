@@ -91,5 +91,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>This app needs access to your photos to upload attachments.</string>
+
+    <key>NSCameraUsageDescription</key>
+    <string>This app needs access to camera to take photos.</string>
 </dict>
 </plist>

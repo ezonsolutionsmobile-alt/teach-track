@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -16,6 +16,7 @@ import { useThemeStore } from '../../../store/useThemeStore';
 import { ResetCodeGenerate } from '../../../services/auth/authService';
 import { showToast } from '../../../components/ShowToas';
 import Heading from '../../../components/GradientHeading';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ForgotPasswordScreen({ navigation }) {
   // Retrieve current app theme from Zustand global store
@@ -49,6 +50,19 @@ export default function ForgotPasswordScreen({ navigation }) {
     }
 
   };
+
+
+useFocusEffect(
+  React.useCallback(() => {
+    // Jab screen focus hogi (user screen par aayega)
+    setIsDisable(false);
+
+    return () => {
+      // Jab screen blur hogi (user screen se jayega)
+      // Agar aap chahte hain ke jate waqt bhi kuch reset ho
+    };
+  }, [])
+);
 
   return (
     <AuthScreenWrapper backgroundImage={bg_image} backgroundPattern={bg_pattern}>

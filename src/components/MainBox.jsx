@@ -41,6 +41,41 @@ const MainBox = ({
   }
 
   return (
+    // <View
+    //   style={[
+    //     styles.wrapper,
+    //     {
+    //       width,
+    //       height: height === 'auto' ? undefined : height,
+    //       maxHeight,
+    //       backgroundColor,
+    //       borderRadius,
+    //     },
+    //     style,
+    //   ]}
+    // >
+    //   <ScrollView
+    //     showsVerticalScrollIndicator={false}
+    //     scrollEnabled={scrollEnabled}
+    //     contentContainerStyle={{
+    //       paddingHorizontal,
+    //       paddingVertical,
+    //     }}
+    //     refreshControl={
+    //       onRefresh && (
+    //         <RefreshControl
+    //           refreshing={refreshing}
+    //           onRefresh={onRefresh}
+    //         />
+    //       )
+    //     }
+    //     bounces={false}   // 🔥 iOS fix (important)
+    //     overScrollMode="never" // Android stable
+    //   >
+    //     {children}
+    //   </ScrollView>
+    // </View>
+
     <View
       style={[
         styles.wrapper,
@@ -54,24 +89,15 @@ const MainBox = ({
         style,
       ]}
     >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        scrollEnabled={scrollEnabled}
-        contentContainerStyle={{
+      {/* 🔥 ScrollView ko yahan se hata dein */}
+      <View
+        style={{
           paddingHorizontal,
           paddingVertical,
         }}
-        refreshControl={
-          onRefresh && (
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          )
-        }
       >
         {children}
-      </ScrollView>
+      </View>
     </View>
   );
 };

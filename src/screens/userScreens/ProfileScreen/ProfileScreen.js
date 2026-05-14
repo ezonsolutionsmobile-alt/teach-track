@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from "react";
-import { View, StyleSheet, Image, TouchableOpacity, BackHandler } from "react-native";
+import { View, StyleSheet, Image, TouchableOpacity, BackHandler, Platform } from "react-native";
 import CustomHeader from "../../../components/CustomHeader";
 import AppText from "../../../components/AppText";
 import themes from "../../../themes/colors";
@@ -13,6 +13,7 @@ import {
   LogoutIcon,
   ForwardIcon,
   ChangePasswordIcon,
+  DashedBorder,
 } from "../../../assets/Icons";
 import { useAuthStore } from "../../../store/useAuthStore";
 import CustomStatusBar from "../../../components/CustomStatusBar";
@@ -171,15 +172,22 @@ export default function ProfileScreen() {
 }
 const MenuItem = ({ title, icon, isLogout = false, onPress, theme, isBorder = true }) => {
   return (
-    <TouchableOpacity style={[styles.menuItem, !isBorder && { borderBottomWidth: 0 }]} onPress={onPress}>
-      <View style={styles.leftRow}>
-        {icon}
-        <AppText style={[styles.menuText, { fontSize: moderateScale(theme?.text_font_size?.large) }]} color={theme?.theme?.dark_text}>
-          {title}
-        </AppText>
-      </View>
-      {!isLogout && <ForwardIcon color={theme?.theme?.medium_text} />}
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity style={[styles.menuItem, !isBorder && { borderBottomWidth: 0 }]} onPress={onPress}>
+        <View style={styles.leftRow}>
+          {icon}
+          <AppText style={[styles.menuText, { fontSize: moderateScale(theme?.text_font_size?.large) }]} color={theme?.theme?.dark_text}>
+            {title}
+          </AppText>
+        </View>
+        {!isLogout && <ForwardIcon color={theme?.theme?.medium_text} />}
+      </TouchableOpacity>
+      {Platform.OS === 'ios' && isBorder &&
+        <View style={{}}>
+          <DashedBorder color={theme?.theme?.medium_text} />
+        </View>
+      }
+    </>
   );
 }
 
@@ -204,7 +212,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "95%",
+
+    // Android Shadow
     elevation: 5,
+
+    // iOS Shadow Properties
+    shadowColor: "#000", // Shadow ka color
+    shadowOffset: {
+      width: 0,
+      height: 2, // Shadow kitni niche dikhegi
+    },
+    shadowOpacity: 0.25, // Shadow ki transparency (0 to 1)
+    shadowRadius: 3.84, // Shadow ka blur radius
+
     transform: [{ translateY: moderateScale(30) }],
   },
   avatar: {

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert, Modal } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert, Modal, Platform } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -248,17 +248,17 @@ export default function LoginScreen({ navigation }) {
         }
     };
 
-  useEffect(() => {
-        const checkBiometric = async () => {
-            const isBiometric = await AsyncStorage.getItem(STORAGE_KEY);
+//   useEffect(() => {
+//         const checkBiometric = async () => {
+//             const isBiometric = await AsyncStorage.getItem(STORAGE_KEY);
 
-            if (isBiometric) {
-                handleBiometricLogin();
-            }
-        };
+//             if (isBiometric) {
+//                 handleBiometricLogin();
+//             }
+//         };
 
-        checkBiometric();
-    }, []);
+//         checkBiometric();
+//     }, []);
     return (
         <AuthScreenWrapper backgroundImage={bg_image} backgroundPattern={bg_pattern}>
             {/* Error Modal */}
@@ -302,7 +302,6 @@ export default function LoginScreen({ navigation }) {
                 />
 
                 {/* Login Button */}
-                {/* Login Button */}
                 <AppButton
                     title="Sign In"
                     onPress={handleSubmit(onSubmit)}
@@ -334,6 +333,8 @@ export default function LoginScreen({ navigation }) {
             </MainBox>
 
             {/* reCAPTCHA v2 Component */}
+    
+
             <Recaptcha
                 ref={recaptchaRef}
                 siteKey={theme?.frontend_recaptcha_key} // replace with your actual site key
@@ -348,7 +349,9 @@ export default function LoginScreen({ navigation }) {
                             justifyContent: 'flex-end',
                             padding: 10,
                             backgroundColor: '#605c5c', // optional: give header a subtle background
-                            opacity: 0.8
+                            opacity: 0.8,
+                             zIndex: 9999,
+                             paddingTop:Platform.OS == 'ios' && verticalScale(50) ,
                         }}
                     >
                         <TouchableOpacity
@@ -365,7 +368,8 @@ export default function LoginScreen({ navigation }) {
                                 shadowOpacity: 0.2,
                                 shadowRadius: 2,
                                 elevation: 3, // for Android shadow
-                                opacity: 1
+                                opacity: 1,
+                                zIndex: 10000, // ensure it stays on top
                             }}
                         >
                             <AppText style={{ fontSize: 18, fontWeight: 'bold', color: '#333' }}>×</AppText>

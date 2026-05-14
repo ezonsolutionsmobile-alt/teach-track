@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Platform } from 'react-native';
 import CustomHeader from '../../../components/CustomHeader';
 import SubjectCard from '../../../components/SubjectCard';
 import MainBox from '../../../components/MainBox';
@@ -16,6 +16,7 @@ import { useHomeWorkStore } from '../../../store/useHomeWorkStore';
 import { useHiddenScreenStore } from '../../../store/useHiddenScreenStore';
 import useAcademicFlowStore from '../../../store/useAcademicFlowStore';
 import { useTabStore } from '../../../store/useTabStore';
+import { DashedBorder } from '../../../assets/Icons';
 
 
 export default function SubjectListScreen({ route }) {
@@ -78,12 +79,12 @@ export default function SubjectListScreen({ route }) {
     }, [navigation]);
 
 
-        const routeName = useNavigationState(state => {
-            const route = state.routes[state.index];
-            console.log(state.routes,'  subjectScreen');  
-            return route.name;
-        });
-    
+    const routeName = useNavigationState(state => {
+        const route = state.routes[state.index];
+        console.log(state.routes, '  subjectScreen');
+        return route.name;
+    });
+
     return (
         <>
             {/* <OrientationLocker orientation={PORTRAIT} /> */}
@@ -115,6 +116,11 @@ export default function SubjectListScreen({ route }) {
                                 {classList?.class_section_list?.class_section_name}
                             </AppText>
                         </View>
+                        {Platform.OS === 'ios' &&
+                            <View style={{ marginBottom: verticalScale(8), paddingTop: verticalScale(12), }}>
+                                <DashedBorder color={theme?.theme?.medium_text} />
+                            </View>
+                        }
                         <View style={{ flex: 1, paddingHorizontal: scale(8), }}>
 
                             {/* FlatList of campus shifts */}
@@ -140,15 +146,20 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
         paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
-        backgroundColor: themes?.white,
+        backgroundColor: themes?.off_white,
     },
     headingContainer: {
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderBottomColor: themes.mediumText,
-        borderStyle: 'dashed',
-        marginBottom: 8,
         alignItems: 'center',
+
+        ...Platform.select({
+            android: {
+                marginBottom: verticalScale(8),
+                paddingBottom: verticalScale(12),
+                borderBottomWidth: 1,
+                borderStyle: 'dashed',
+                borderBottomColor: themes?.borderGrey,
+            },
+        }),
     },
     heading: {
         fontSize: moderateScale(18),

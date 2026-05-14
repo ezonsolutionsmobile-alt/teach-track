@@ -1,6 +1,6 @@
 // AuthScreenWrapper.js
 import React from 'react';
-import { View, Image, StyleSheet, Dimensions } from 'react-native';
+import { View, Image, StyleSheet, Dimensions, Platform } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { OrientationLocker, PORTRAIT } from 'react-native-orientation-locker';
@@ -20,6 +20,11 @@ export default function AuthScreenWrapper({
 }) {
     const insets = useSafeAreaInsets();
 
+    const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+    const DYNAMIC_OFFSET = Platform.select({
+        ios: -SCREEN_HEIGHT * 0.22, // Screen ki total height ka 15% negative offset
+        android: -SCREEN_HEIGHT * 0.15,                 // Android pe mostly default behavior stable hota hai
+    });
     return (
         <>
             <OrientationLocker orientation={PORTRAIT} />
@@ -28,7 +33,7 @@ export default function AuthScreenWrapper({
                 {backgroundImage && (
                     <Image
                         source={backgroundImage}
-                        style={[styles.bgImage, { bottom: insets.bottom }]}
+                        style={[styles.bgImage, { bottom: Platform.OS === 'ios' ? 0 : insets.bottom }]}
                         resizeMode="cover"
                         pointerEvents="none"
                     />
@@ -42,19 +47,28 @@ export default function AuthScreenWrapper({
                     />
                 )}
                 <KeyboardAwareScrollView
+
+                    bottomOffset={Platform.OS === 'ios' ? scale(80) : scale(80)} // 👈 Android par offset barha dein
+                    extraScrollHeight={Platform.OS === 'ios' ? scale(20) : scale(20)} // 👈 Extra height add karein
+                    enableOnAndroid={true}
+
                     style={{ flex: 1 }}
                     contentContainerStyle={styles.scrollContent}
-                    extraScrollHeight={20}
-                    keyboardOpeningTime={0}
-                    enableOnAndroid
+                    // extraScrollHeight={Platform.OS === 'ios' ? 20 : 0}
+                    extraKeyboardSpace={DYNAMIC_OFFSET}
+                    // keyboardOpeningTime={0}
+                    // enableOnAndroid
                     keyboardShouldPersistTaps="handled"
+                    showsVerticalScrollIndicator={false}
+                    bounces={false}   // 🔥 iOS fix (important)
+                    overScrollMode="never" // Android stable
                 >
                     {children}
 
-                    <AppText style={[styles.versionText, { bottom: insets.bottom - 20 }]} color="#fff">
-                        version 2.0.0
-                    </AppText>
                 </KeyboardAwareScrollView>
+                <AppText style={[styles.versionText]} color="#fff">
+                    version 2.0.0
+                </AppText>
             </View>
         </>
     );
@@ -75,14 +89,15 @@ const styles = StyleSheet.create({
         height: SCREEN_HEIGHT * 0.45,
     },
     scrollContent: {
-        flexGrow: 1,
+        flex: 1,
         justifyContent: 'center',
         alignContent: 'center',
         paddingHorizontal: scale(8),
-        marginBottom: scale(56),
+        marginBottom: scale(12),
     },
     versionText: {
-        position: 'absolute',
+        // position: 'absolute',
+        marginBottom: scale(12),
         alignSelf: 'center',
     }
 });

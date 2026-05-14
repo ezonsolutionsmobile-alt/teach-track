@@ -16,7 +16,9 @@ export default function DrawerNavigator() {
         headerShown: false,
         swipeEnabled: false,
         drawerStyle: { backgroundColor: themes.white, width: 280 },
+        drawerType: 'front',
       }}
+
       drawerContent={(props) => <CustomDrawerContent {...props} />}
     >
       {/* 🔥 SINGLE SOURCE OF TRUTH */}

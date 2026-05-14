@@ -1,6 +1,7 @@
 const themes = {
   // Core colors
   white: '#FFFFFF',
+  off_white:"#f2f2f2",
   black: '#000000',
 
   // Primary ClickUp colors

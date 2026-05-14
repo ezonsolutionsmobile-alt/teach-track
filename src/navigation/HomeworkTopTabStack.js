@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
@@ -20,6 +20,7 @@ import useAcademicFlowStore from '../store/useAcademicFlowStore';
 import { useTabStore } from '../store/useTabStore';
 import { BackHandler } from 'react-native';
 import { CommonActions, useFocusEffect, useNavigationState } from '@react-navigation/native';
+import { DashedBorder } from '../assets/Icons';
 
 const Stack = createNativeStackNavigator();
 const Tab = createMaterialTopTabNavigator();
@@ -70,7 +71,7 @@ function HomeworkTabsInner({ navigation }) {
 
         return unsubscribe;
     }, [navigation, handleBackAction]);
-    
+
     return (
         <View style={{ flex: 1, backgroundColor: themes.white }}>
             <CustomStatusBar
@@ -112,6 +113,11 @@ function HomeworkTabsInner({ navigation }) {
                         placeholder="Please select a year session" setPreviousSelect={setIsYearSessionUpdated} />
                 </View>
             </View>
+            {Platform.OS === 'ios' &&
+                <View style={{ marginBottom: verticalScale(8), paddingTop: verticalScale(12), }}>
+                    <DashedBorder color={theme?.theme?.medium_text} />
+                </View>
+            }
 
             {/* Tabs */}
             <Tab.Navigator
@@ -184,17 +190,26 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
         paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
-        backgroundColor: themes?.white,
-    },
-    headingContainer: {
-        paddingVertical: verticalScale(12),
-        borderBottomWidth: 1,
-        borderBottomColor: themes.mediumText,
-        borderStyle: 'dashed',
-        marginBottom: verticalScale(12),
-        alignItems: 'center',
+        backgroundColor: themes?.off_white,
     },
 
+    headingContainer: {
+        alignItems: 'center',
+
+        ...Platform.select({
+            android: {
+                paddingVertical: verticalScale(12),
+                marginBottom: verticalScale(12),
+                borderBottomWidth: 1,
+                borderStyle: 'dashed',
+                borderBottomColor: themes?.borderGrey,
+            }, ios: {
+                // iOS pe simple solid line ya no border
+                paddingTop: verticalScale(12),
+
+            },
+        }),
+    },
 
     tabContainer: {
         paddingHorizontal: scale(8),

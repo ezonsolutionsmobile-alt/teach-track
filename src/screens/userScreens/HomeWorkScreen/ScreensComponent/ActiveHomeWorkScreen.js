@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet} from 'react-native';
+import { View, StyleSheet, Platform} from 'react-native';
 import MainBox from '../../../../components/MainBox';
 import themes from '../../../../themes/colors';
 import { moderateScale, scale, verticalScale } from '../../../../themes/sizes';
@@ -345,9 +345,14 @@ export default function ActiveHomeWorkScreen({navigation}) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
         paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
         backgroundColor: themes?.white,
+        ...Platform.select({
+            android: {
+                paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
+               
+            },
+        }),
     },
     headingContainer: {
         paddingBottom: 12,

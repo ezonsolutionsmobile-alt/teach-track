@@ -19,6 +19,7 @@ import globalStyles from '../../../themes/globalStyles';
 import MonthYearPickerModal from '../../../components/MonthYearPickerModal';
 import Sound from 'react-native-sound';
 import { useTabStore } from '../../../store/useTabStore';
+import { DashedBorder } from '../../../assets/Icons';
 
 const getDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371000;
@@ -31,7 +32,7 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
 export default function CheckInOutScreen({ navigation }) {
     const { theme } = useThemeStore();
     const submitSound = useRef(null);
-    const { setSource, setLastHomeScreen, setActiveTab: setSideActiveTab } = useTabStore(); 
+    const {  setLastHomeScreen, setActiveTab: setSideActiveTab } = useTabStore();
 
     const [activeTab, setActiveTab] = useState('Check In/Out');
     const isFocused = useIsFocused();
@@ -46,7 +47,7 @@ export default function CheckInOutScreen({ navigation }) {
     // Default location ALLOWED_AREA par rakhi hai taake map blank na ho
     const [userLocation, setUserLocation] = useState({ lat: 0, lng: 0, accuracy: 0 });
     const [isInsideArea, setIsInsideArea] = useState(false);
-   
+
     const [showPicker, setShowPicker] = useState(false);
     const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -352,7 +353,11 @@ locations.forEach(loc => {
                 <View style={styles.statusDivider} />
                 <StatusItem label="Last Check Out" time={CheckInOutTime(lastCheckIn?.last_check_out) ? lastCheckIn?.last_check_out : '--:--'} theme={theme} color={themes?.error} />
             </View>
-
+            {Platform.OS === 'ios' &&
+                <View style={{}}>
+                    <DashedBorder color={theme?.theme?.medium_text} />
+                </View>
+            }
             <View style={styles.tabContainer}>
                 <View style={styles.tabRow}>
                     {['Check In/Out', 'History'].map((tab, idx) => (
@@ -482,7 +487,19 @@ const StatusItem = ({ label, time, theme, color }) => (
 
 const styles = StyleSheet.create({
     container: { flex: 1, position: 'relative' },
-    statusRow: { flexDirection: 'row', paddingVertical: verticalScale(8), borderBottomWidth: 1, borderBottomColor: themes.mediumText, borderStyle: 'dashed' },
+    statusRow: {
+        flexDirection: 'row',
+        paddingVertical: verticalScale(8),
+        ...Platform.select({
+            android: {
+                borderBottomWidth: 1,
+                borderBottomColor: themes.mediumText,
+                borderStyle: 'dashed',
+            },
+            ios: {
+            },
+        }),
+    },
     statusItem: { alignItems: 'center', flex: 1 },
     statusDivider: { width: 1, height: 25, backgroundColor: '#ddd' },
     tabContainer: {

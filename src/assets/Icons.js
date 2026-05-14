@@ -25,6 +25,19 @@ export const CheckIcon = ({ width = 24, height = 24, color = 'black' }) => (
     />
   </Svg>
 );
+export const DashedBorder = ({ width = 24, height = 24, color = 'black', strokeWidth = 2 }) => (
+  <Svg height="1" width="100%">
+    <Line
+      x1="0"
+      y1="0"
+      x2="100%"
+      y2="0"
+      stroke={color}
+      strokeWidth={strokeWidth}
+      strokeDasharray="4 4"
+    />
+  </Svg>
+);
 export const CrossIcon = ({ width = 24, height = 24, color = 'black' }) => (
   <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">
     <Path

@@ -4,6 +4,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  Modal, // ✅ Added for iOS
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { CalendarIcon } from '../assets/Icons';
@@ -19,20 +20,16 @@ export default function CustomDatePicker({
   fontWeight = 'Bold',
   paddingVertical = 14,
   theme,
-  disabled = false,  // ✅ Added
+  disabled = false,
   maximumDate = true
 }) {
-
   const [showPicker, setShowPicker] = useState(false);
 
   const handleChange = (event, selectedDate) => {
-
-    if (event?.type === "dismissed") {
+    // Android par select karte hi band ho jaye
+    if (Platform.OS === 'android') {
       setShowPicker(false);
-      return;
     }
-
-    setShowPicker(Platform.OS === 'ios');
 
     if (selectedDate) {
       onDateChange && onDateChange(selectedDate);
@@ -50,10 +47,46 @@ export default function CustomDatePicker({
     ? parsedDate.toLocaleDateString()
     : placeholder;
 
+  // ✅ iOS ke liye Picker UI
+  const renderPicker = () => {
+    const picker = (
+      <DateTimePicker
+        value={parsedDate || new Date()}
+        mode="date"
+        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+        onChange={handleChange}
+        maximumDate={maximumDate ? new Date(2100, 11, 31) : new Date()}
+        minimumDate={new Date(2000, 0, 1)}
+      />
+    );
+
+    if (Platform.OS === 'ios') {
+      return (
+        <Modal transparent animationType="slide" visible={showPicker}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              {/* iOS Header with Done Button */}
+              <View style={styles.header}>
+                <TouchableOpacity onPress={() => setShowPicker(false)}>
+                  <AppText weight="Bold" style={{ color: theme?.theme?.primary, fontSize: 18 }}>
+                    Done
+                  </AppText>
+                </TouchableOpacity>
+              </View>
+              {picker}
+            </View>
+          </View>
+        </Modal>
+      );
+    }
+
+    return picker;
+  };
+
   return (
     <View>
       <TouchableOpacity
-        disabled={disabled}   // ✅ Disable touch
+        disabled={disabled}
         style={[
           styles.button,
           {
@@ -61,12 +94,10 @@ export default function CustomDatePicker({
               ? theme?.theme?.primary
               : themes.borderGrey,
             paddingVertical: verticalScale(paddingVertical),
-
-            opacity: disabled ? 1 : 1,   // ✅ Visual feedback
           },
         ]}
         onPress={() => {
-          if (!disabled) setShowPicker(true);  // ✅ Extra safety
+          if (!disabled) setShowPicker(true);
         }}
         activeOpacity={0.8}
       >
@@ -98,17 +129,7 @@ export default function CustomDatePicker({
         />
       </TouchableOpacity>
 
-      {/* ✅ Picker will not render if disabled */}
-      {showPicker && !disabled && (
-        <DateTimePicker
-          value={parsedDate || new Date()}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={handleChange}
-          maximumDate={maximumDate ? new Date(2100, 11, 31) : new Date()}
-          minimumDate={new Date(2000, 0, 1)}
-        />
-      )}
+      {showPicker && !disabled && renderPicker()}
     </View>
   );
 }
@@ -122,5 +143,24 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     backgroundColor: themes.white,
+  },
+  // ✅ iOS Styles
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingBottom: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
 });

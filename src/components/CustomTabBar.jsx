@@ -26,7 +26,7 @@ const CustomTabBar = ({ state, navigation }) => {
   const excludedRoutes = ['Add', 'Active', 'Cancelled', 'HomeworkTopTabStack'];
   // console.log(activeTab, "activeTabactiveTabactiveTab")
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+    <View style={[styles.container]}>
       <View style={styles.topShadow} />
 
       {state.routes

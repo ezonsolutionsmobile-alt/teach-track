@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Pressable, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, StyleSheet, Pressable, KeyboardAvoidingView, Platform, ScrollView, Dimensions } from 'react-native';
 import CustomDatePicker from '../../../../components/CustomDatePicker';
 import MainBox from '../../../../components/MainBox';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
@@ -25,7 +25,7 @@ import { useApiRoutesStore } from '../../../../store/useApiRoutesStore';
 import moment from 'moment';
 import useAcademicFlowStore from '../../../../store/useAcademicFlowStore';
 import { useTabStore } from '../../../../store/useTabStore';
-
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 export default function AddHomeworkScreen() {
     const submitSound = useRef(null);
     const navigation = useNavigation();
@@ -47,7 +47,11 @@ export default function AddHomeworkScreen() {
     const [attachment, setAttachment] = useState(null)
 
     // pagination end -----------<><><>----------
-
+    const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+    const DYNAMIC_OFFSET = Platform.select({
+        ios: -SCREEN_HEIGHT * 0.12, // Screen ki total height ka 15% negative offset
+        android: -SCREEN_HEIGHT * 0.08,                 // Android pe mostly default behavior stable hota hai
+    });
 
     // ADD FORM
     const { control, handleSubmit,
@@ -160,6 +164,8 @@ export default function AddHomeworkScreen() {
             const result = await pick({
                 allowMultiSelection: false,
                 type: [
+                    'public.image', // ✅ iOS safe image type
+                    'public.pdf',   // ✅ iOS PDF
                     'image/*',
                     'application/pdf',
                     'application/msword',
@@ -218,14 +224,29 @@ export default function AddHomeworkScreen() {
                             {optionLoader ? <AddHomeworkSkeleton /> :
                                 selected?.value &&
                                 (
-                                    <KeyboardAvoidingView
+                                    <KeyboardAwareScrollView
                                         style={{ flex: 1, paddingHorizontal: scale(8) }}
                                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                                        keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 90}
+                                        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 20}
+
+                                        bottomOffset={Platform.OS === 'ios' ? scale(80) : scale(80)} // 👈 Android par offset barha dein
+                                        extraScrollHeight={Platform.OS === 'ios' ? scale(20) : scale(20)} // 👈 Extra height add karein
+                                        enableOnAndroid={true}
+
+
+                                        contentContainerStyle={styles.scrollContent}
+                                        // extraScrollHeight={Platform.OS === 'ios' ? 20 : 0}
+                                        extraKeyboardSpace={DYNAMIC_OFFSET}
+                                        // keyboardOpeningTime={0}
+                                        // enableOnAndroid
+                                        keyboardShouldPersistTaps="handled"
+                                        showsVerticalScrollIndicator={false}
+                                        bounces={false}   // 🔥 iOS fix (important)
+                                        overScrollMode="never" // Android stable
                                     >
                                         <ScrollView
                                             style={{ flex: 1 }}
-                                            contentContainerStyle={{ paddingBottom: verticalScale(12) }}
+                                            contentContainerStyle={{ paddingBottom: verticalScale(Platform.OS === 'ios' ? 24 : 12) }}
                                             keyboardShouldPersistTaps="handled"
                                             showsVerticalScrollIndicator={false}
                                         >
@@ -416,7 +437,7 @@ export default function AddHomeworkScreen() {
                                                 style={{ marginTop: 0 }}
                                             />
                                         </View>
-                                    </KeyboardAvoidingView>
+                                    </KeyboardAwareScrollView>
                                 )}
                         </MainBox>
                     </View>
@@ -429,9 +450,14 @@ export default function AddHomeworkScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
         paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
         backgroundColor: themes?.white,
+        ...Platform.select({
+            android: {
+                paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
+
+            },
+        }),
     },
     headingContainer: {
         paddingBottom: 12,

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, FlatList, TouchableOpacity, Platform } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AppText from '../../../components/AppText';
 import LoginHistorySkeleton from '../../../components/Skeletons/LoginHistorySkeleton';
@@ -18,6 +18,7 @@ import axios from 'axios';
 import { showToast } from '../../../components/ShowToas';
 import NoDataFound from '../../../components/NoDataFound';
 import { useApiRoutesStore } from '../../../store/useApiRoutesStore';
+import { DashedBorder } from '../../../assets/Icons';
 
 
 export default function ActiveSessionsScreen() {
@@ -45,7 +46,7 @@ export default function ActiveSessionsScreen() {
 
     // global routes 
     const { routes } = useApiRoutesStore();
-console.log(routes,"routesroutes")
+
     // get LoginHistory Handler 
     const getLoginHistoryHandler = async () => {
         setLoading(true)
@@ -170,7 +171,7 @@ console.log(routes,"routesroutes")
                         <TouchableOpacity
                             onPress={() => !btnSingleLogout && handleLogoutSingle(item)}
                             style={styles.logoutSingleBtn}
-                           
+
                         >
                             <AppText style={[styles.logoutSingleText, { fontSize: moderateScale(theme?.text_font_size?.extraSmall) }]}>Logout</AppText>
                         </TouchableOpacity>
@@ -221,7 +222,11 @@ console.log(routes,"routesroutes")
                         <View style={styles.headingContainer}>
                             <AppText weight='Bold' style={[styles.heading, { fontSize: moderateScale(theme?.text_font_size?.large), color: theme?.theme?.dark_text }]}>Current Session</AppText>
                         </View>
-
+                        {Platform.OS === 'ios' &&
+                            <View style={{paddingBottom: verticalScale(8)}}>
+                                <DashedBorder color={theme?.theme?.medium_text} />
+                            </View>
+                        }
                         <View style={{ paddingHorizontal: 12, marginBottom: 6 }}>
                             {renderSessionItem({ item: currentSession, isCurrent: true })}
                         </View>
@@ -230,6 +235,11 @@ console.log(routes,"routesroutes")
                         <View style={styles.headingContainer}>
                             <AppText weight='Bold' style={[styles.heading, { fontSize: moderateScale(theme?.text_font_size?.large), color: theme?.theme?.dark_text }]}>Other Devices</AppText>
                         </View>
+                        {Platform.OS === 'ios' &&
+                            <View style={{paddingBottom: verticalScale(8)}}>
+                                <DashedBorder color={theme?.theme?.medium_text} />
+                            </View>
+                        }
                         {loading ?
                             <LoginHistorySkeleton />
                             :
@@ -287,12 +297,17 @@ const styles = StyleSheet.create({
         backgroundColor: themes.white,
     },
     headingContainer: {
-        paddingBottom: 8,
         borderBottomWidth: 1,
         borderBottomColor: themes.mediumText,
         borderStyle: 'dashed',
         marginBottom: 8,
         alignItems: 'center',
+        ...Platform.select({
+            android: {
+                paddingBottom: 8,
+
+            },
+        }),
     },
     heading: {
         textAlign: 'center',

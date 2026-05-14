@@ -16,6 +16,7 @@ import { useScreenNavigationStore } from '../../../store/useScreenNavigationStor
 import { useApiRoutesStore } from '../../../store/useApiRoutesStore';
 import { useTabStore } from '../../../store/useTabStore';
 import useAcademicFlowStore from '../../../store/useAcademicFlowStore';
+import themes from '../../../themes/colors';
 
 
 
@@ -136,6 +137,6 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
         paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
-        backgroundColor: '#f2f2f2',
+        backgroundColor: themes?.off_white,
     },
 });
