@@ -59,18 +59,73 @@ export default function LoginScreen({ navigation }) {
         resolver: yupResolver(loginSchema),
     });
 
+    // const handleBiometricLogin = async () => {
+    //     try {
+    //         // 1. Check karein ki sensor available hai (FaceID/TouchID/Biometrics)
+    //         const { available, biometryType } = await rnBiometrics.isSensorAvailable();
+    //         console.log(available, "availableavailableavailable><<><><><><", biometryType)
+    //         if (!available) {
+    //             console.log(biometryType, "biometryTypebiometryType")
+    //             Alert.alert("Biometrics not available", "Please enable Face ID or Fingerprint in your device settings.");
+    //             return;
+    //         }
+    //         const { success } = await rnBiometrics.simplePrompt({
+    //             promptMessage: 'Login with Face ID / Fingerprint',
+    //         });
+
+    //         if (!success) return;
+
+    //         const credentials = await Keychain.getGenericPassword({ service: APP_BIOMETRIC_KEY });
+    //         console.log(credentials, "credentialscredentialscredentials")
+    //         if (!credentials) {
+    //             Alert.alert("No saved session found. Please login again.");
+    //             return;
+    //         }
+    //         const token = credentials.password;
+    //         // 👉 same structure as login response
+    //         const storedUser = useAuthStore.getState().user;
+
+    //         useAuthStore.getState().setAuth(
+    //             token,
+    //             storedUser,
+    //         );
+
+    //         setActiveTab('HomeStack')
+    //         setLastHomeScreen('HomeScreen')
+
+    //     } catch (e) {
+    //         console.log("biometric error:", e);
+    //     }
+    // };
+
+
+    // Close reCAPTCHA modal
+
+
     const handleBiometricLogin = async () => {
         try {
             // 1. Check karein ki sensor available hai (FaceID/TouchID/Biometrics)
             const { available, biometryType } = await rnBiometrics.isSensorAvailable();
             console.log(available, "availableavailableavailable><<><><><><", biometryType)
+
             if (!available) {
                 console.log(biometryType, "biometryTypebiometryType")
-                Alert.alert("Biometrics not available", "Please enable Face ID or Fingerprint in your device settings.");
+                // 👉 iOS aur Android ke mutabiq error message dynamic kar diya
+                const sensorName = Platform.OS === 'ios' ? 'Face ID / Touch ID' : 'Biometrics / Fingerprint';
+                Alert.alert("Biometrics not available", `Please enable ${sensorName} in your device settings.`);
                 return;
             }
+
+            // 👉 iOS par "Face ID" aur Android par "Biometrics" text show karne ke liye
+            let promptMessage = 'Login with Biometrics';
+            if (Platform.OS === 'ios') {
+                promptMessage = biometryType === 'FaceID' ? 'Login with Face ID' : 'Login with Touch ID';
+            } else {
+                promptMessage = 'Login with Fingerprint / Face';
+            }
+
             const { success } = await rnBiometrics.simplePrompt({
-                promptMessage: 'Login with Face ID / Fingerprint',
+                promptMessage: promptMessage,
             });
 
             if (!success) return;
@@ -99,7 +154,6 @@ export default function LoginScreen({ navigation }) {
     };
 
 
-    // Close reCAPTCHA modal
     const handleCaptchaClose = () => {
         setIsLoading(false);
         setIsDisable(false);
@@ -116,7 +170,7 @@ export default function LoginScreen({ navigation }) {
     // Trigger reCAPTCHA on login press
     const onSubmit = async (data) => {
 
-    pendingForm.current = data;
+        pendingForm.current = data;
         recaptchaRef.current.open(); // shows reCAPTCHA checkbox
         setCaptchaVisible(true)
 
@@ -176,7 +230,7 @@ export default function LoginScreen({ navigation }) {
             setIsDisable(true)
             const res = await loginService(routes?.login, body);
             if (res?.data?.status) {
-                  await useAuthStore?.getState()?.clearKeychainData()
+                await useAuthStore?.getState()?.clearKeychainData()
                 const { access_token, user_details } = res?.data;
 
                 const biometricEnabled = await AsyncStorage.getItem(STORAGE_KEY);
@@ -231,16 +285,17 @@ export default function LoginScreen({ navigation }) {
                     service: APP_BIOMETRIC_KEY,
                 });
             }
-
+            // 🌟 Toast message ko dono platforms ke mutabiq dynamic kar diya
+            const successMessage = enableBiometric
+                ? (Platform.OS === 'ios' ? "Face ID / Touch ID enabled!" : "Biometric login enabled!")
+                : "Login successful!";
             resetToHome();
             setShowBiometricModal(false);
             // 4. Toast message
             showToast(
                 "success",
                 "",
-                enableBiometric
-                    ? "Biometric login enabled!"
-                    : "Login successful!"
+                successMessage
             );
 
         } catch (error) {
@@ -248,17 +303,17 @@ export default function LoginScreen({ navigation }) {
         }
     };
 
-//   useEffect(() => {
-//         const checkBiometric = async () => {
-//             const isBiometric = await AsyncStorage.getItem(STORAGE_KEY);
+    useEffect(() => {
+        const checkBiometric = async () => {
+            const isBiometric = await AsyncStorage.getItem(STORAGE_KEY);
 
-//             if (isBiometric) {
-//                 handleBiometricLogin();
-//             }
-//         };
+            if (isBiometric) {
+                handleBiometricLogin();
+            }
+        };
 
-//         checkBiometric();
-//     }, []);
+        checkBiometric();
+    }, []);
     return (
         <AuthScreenWrapper backgroundImage={bg_image} backgroundPattern={bg_pattern}>
             {/* Error Modal */}
@@ -333,7 +388,7 @@ export default function LoginScreen({ navigation }) {
             </MainBox>
 
             {/* reCAPTCHA v2 Component */}
-    
+
 
             <Recaptcha
                 ref={recaptchaRef}
@@ -350,8 +405,8 @@ export default function LoginScreen({ navigation }) {
                             padding: 10,
                             backgroundColor: '#605c5c', // optional: give header a subtle background
                             opacity: 0.8,
-                             zIndex: 9999,
-                             paddingTop:Platform.OS == 'ios' && verticalScale(50) ,
+                            zIndex: 9999,
+                            paddingTop: Platform.OS == 'ios' && verticalScale(50),
                         }}
                     >
                         <TouchableOpacity

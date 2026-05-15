@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, Platform} from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import MainBox from '../../../../components/MainBox';
 import themes from '../../../../themes/colors';
 import { moderateScale, scale, verticalScale } from '../../../../themes/sizes';
@@ -21,16 +21,16 @@ import { useApiRoutesStore } from '../../../../store/useApiRoutesStore';
 import { useHiddenScreenStore } from '../../../../store/useHiddenScreenStore';
 import useAcademicFlowStore from '../../../../store/useAcademicFlowStore';
 
-export default function ActiveHomeWorkScreen({navigation}) {
+export default function ActiveHomeWorkScreen({ navigation }) {
     const submitSound = useRef(null);
     // Retrieve current app theme from Zustand global store
     const { theme } = useThemeStore();
     // global routes 
     const { routes } = useApiRoutesStore.getState();
-   const { subjectItem: selectedSubject } = useAcademicFlowStore();
-    const {  optionList, 
+    const { subjectItem: selectedSubject } = useAcademicFlowStore();
+    const { optionList,
         getAllHomeworksHandler, homeworkList, homeworkLoading, refreshing, count, removeHomeWork, setIsUpdated, isUpdated,
-        updateHomeWork, getAllOptionsHandler, selected,  isYearSessionUpdated, setIsYearSessionUpdated } = useHomeWorkStore();
+        updateHomeWork, getAllOptionsHandler, selected, isYearSessionUpdated, setIsYearSessionUpdated } = useHomeWorkStore();
 
     const [btnDisable, setBtnDisable] = useState(false)
 
@@ -233,8 +233,12 @@ export default function ActiveHomeWorkScreen({navigation}) {
             const result = await pick({
                 allowMultiSelection: false,
                 type: [
-                    'image/*',
-                    'application/pdf',
+                    'public.image',            // ✅ iOS Gallery aur Images ke liye sabse zaroori
+                    'public.composite-content', // ✅ iOS general documents ke liye
+                    'com.adobe.pdf',           // ✅ iOS PDFs ke liye strict type
+                    'image/jpeg',              // Android safe
+                    'image/png',               // Android safe
+                    'application/pdf',         // Android safe
                     'application/msword',
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                 ],
@@ -247,7 +251,7 @@ export default function ActiveHomeWorkScreen({navigation}) {
     };
 
     useEffect(() => {
-         if (!isFocused) return;
+        if (!isFocused) return;
         const body = {
             options_data: {
                 "year_session": {
@@ -258,10 +262,10 @@ export default function ActiveHomeWorkScreen({navigation}) {
         if (optionList.length == 0) {
             getAllOptionsHandler(routes?.get_all_options, body)
         }
-    }, [selectedSubject,isFocused])
+    }, [selectedSubject, isFocused])
 
     useEffect(() => {
-          if (!isFocused) return;
+        if (!isFocused) return;
         const fetchData = async () => {
             if (!selected?.value) return;
 
@@ -297,10 +301,10 @@ export default function ActiveHomeWorkScreen({navigation}) {
         selected?.value,
         isUpdated,
         isYearSessionUpdated?.active,
-        selectedSubject,isFocused
+        selectedSubject, isFocused
     ]);
 
-    
+
     return (
         <>
             <View style={{ flex: 1 }}>
@@ -350,7 +354,7 @@ const styles = StyleSheet.create({
         ...Platform.select({
             android: {
                 paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
-               
+
             },
         }),
     },

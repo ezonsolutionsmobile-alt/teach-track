@@ -243,7 +243,7 @@ export default function ActiveSessionsScreen() {
                         {loading ?
                             <LoginHistorySkeleton />
                             :
-                            <View style={{ flex: 1, paddingHorizontal: scale(8), marginBottom: verticalScale(48) }}>
+                            <View style={{ flex: 1, paddingHorizontal: scale(8), marginBottom: verticalScale(Platform.OS === 'ios' ? 38 : 48) }}>
                                 <FlatList
                                     data={loginHistory}
                                     renderItem={({ item }) => renderSessionItem({ item })}
@@ -297,13 +297,13 @@ const styles = StyleSheet.create({
         backgroundColor: themes.white,
     },
     headingContainer: {
-        borderBottomWidth: 1,
         borderBottomColor: themes.mediumText,
-        borderStyle: 'dashed',
         marginBottom: 8,
         alignItems: 'center',
         ...Platform.select({
             android: {
+                borderBottomWidth: 1,
+                borderStyle: 'dashed',
                 paddingBottom: 8,
 
             },
@@ -353,7 +353,13 @@ const styles = StyleSheet.create({
 
     fixedButtonContainer: {
         position: 'absolute',
-        bottom: 10,
+        ...Platform.select({
+            android: {
+                bottom: 10,
+            },ios: {
+                bottom: 0,
+            }
+        }),
         left: 16,
         right: 16,
         zIndex: 10,

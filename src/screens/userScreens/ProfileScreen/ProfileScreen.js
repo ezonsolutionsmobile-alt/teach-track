@@ -248,9 +248,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingVertical: moderateScale(18),
-    borderBottomWidth: 1,
     borderBottomColor: themes.mediumText,
-    borderStyle: "dashed",
+    ...Platform.select({
+      android: {
+        borderBottomWidth: 1,
+        borderStyle: "dashed",
+
+      },
+    }),
   },
   leftRow: {
     flexDirection: "row",

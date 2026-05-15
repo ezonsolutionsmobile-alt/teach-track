@@ -164,10 +164,12 @@ export default function AddHomeworkScreen() {
             const result = await pick({
                 allowMultiSelection: false,
                 type: [
-                    'public.image', // ✅ iOS safe image type
-                    'public.pdf',   // ✅ iOS PDF
-                    'image/*',
-                    'application/pdf',
+                    'public.image',            // ✅ iOS Gallery aur Images ke liye sabse zaroori
+                    'public.composite-content', // ✅ iOS general documents ke liye
+                    'com.adobe.pdf',           // ✅ iOS PDFs ke liye strict type
+                    'image/jpeg',              // Android safe
+                    'image/png',               // Android safe
+                    'application/pdf',         // Android safe
                     'application/msword',
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                 ],

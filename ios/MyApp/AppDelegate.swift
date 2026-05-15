@@ -31,6 +31,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     return true
   }
+
+  // 👇 YEH HAI REAL PRODUCTION METHOD: Objective-C bridge ko crash-free style me read karna
+  func application(
+    _ application: UIApplication,
+    supportedInterfaceOrientationsFor window: UIWindow?
+  ) -> UIInterfaceOrientationMask {
+    
+    // Agar library (Orientation) project me linked hai, toh yeh usse uska current status poochega safely
+    if let orientationClass = NSClassFromString("Orientation") as? AnyObject {
+      let selector = Selector(("getOrientation"))
+      if orientationClass.responds(to: selector) {
+        if let method = orientationClass.method(for: selector) {
+          typealias FunctionType = @convention(c) (AnyClass, Selector) -> UInt
+          let function = unsafeBitCast(method, to: FunctionType.self)
+          let rawValue = function(orientationClass.self as! AnyClass, selector)
+          return UIInterfaceOrientationMask(rawValue: rawValue)
+        }
+      }
+    }
+    
+    // Agar library load nahi hui ya app abhi start ho rahi hai, toh default Portrait rakho
+    return .portrait
+  }
 }
 
 class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {

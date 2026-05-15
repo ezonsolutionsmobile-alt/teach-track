@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal || 12,
-    backgroundColor: themes.overlayGrey || '#f0f2f5',
+    backgroundColor: themes.off_white || '#f0f2f5',
     position: 'relative'
   },
   overlay: {

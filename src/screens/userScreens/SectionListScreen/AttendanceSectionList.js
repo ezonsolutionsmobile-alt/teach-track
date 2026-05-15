@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Platform } from 'react-native';
 import CustomHeader from '../../../components/CustomHeader';
 import CustomDropdownButton from '../../../components/CustomDropdownButton';
 import MainBox from '../../../components/MainBox';
@@ -14,6 +14,7 @@ import { useThemeStore } from '../../../store/useThemeStore';
 import CustomDatePicker from '../../../components/CustomDatePicker';
 import useAcademicFlowStore from '../../../store/useAcademicFlowStore';
 import { useTabStore } from '../../../store/useTabStore';
+import { DashedBorder } from '../../../assets/Icons';
 
 
 export default function AttendanceSectionList({ route }) {
@@ -111,6 +112,11 @@ export default function AttendanceSectionList({ route }) {
                                 />
                             </View>
                         </View>
+                        {Platform.OS === 'ios' &&
+                            <View style={{ marginBottom: verticalScale(8), paddingTop: verticalScale(12), }}>
+                                <DashedBorder color={theme?.theme?.medium_text} />
+                            </View>
+                        }
                         <View style={{ flex: 1, paddingHorizontal: scale(8), }}>
 
                             {/* FlatList of campus shifts */}
@@ -134,14 +140,19 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
         paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
-        backgroundColor: themes?.white,
+        backgroundColor: themes?.off_white || '#f0f2f5',
     },
     headingContainer: {
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderStyle: 'dashed',
-        marginBottom: 8,
         alignItems: 'center',
+          ...Platform.select({
+            android: {
+                marginBottom: verticalScale(8),
+                paddingBottom: verticalScale(12),
+                borderBottomWidth: 1,
+                borderStyle: 'dashed',
+                borderBottomColor: themes?.borderGrey,
+            },
+        }),
     },
 
 });

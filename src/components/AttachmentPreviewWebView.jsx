@@ -28,11 +28,21 @@ export default function AttachmentPreviewWebView({
     const [loading, setLoading] = useState(true);
     const [localPath, setLocalPath] = useState(null);
     const [downloading, setDownloading] = useState(false);
+    const [cleanUrl, setCleanUrl] = useState(null);
     const isPdf = previewUrl?.toLowerCase().endsWith('.pdf');
 
     useEffect(() => {
+        if (!visible || !previewUrl) {
+            // 🔹 Jab modal close ho, toh saara cache aur paths instant reset karo
+            setCleanUrl(null);
+            setLocalPath(null);
+            return;
+        }
+
         setLoading(true);
-        if (isPdf && previewUrl) {
+
+        if (isPdf) {
+            setCleanUrl(previewUrl);
             const downloadPdf = async () => {
                 try {
                     const dirs = RNFetchBlob.fs.dirs;
@@ -41,16 +51,19 @@ export default function AttachmentPreviewWebView({
                     setLocalPath(path);
                 } catch (err) {
                     console.log('PDF download error:', err);
-                } finally {
                     setLoading(false);
                 }
             };
             downloadPdf();
         } else {
-            setLoading(false);
             setLocalPath(null);
+
+            // 🔹 IMAGE CACHE BUSTER: URL ke aage dynamic timestamp lagao taake iOS cache bypass ho jaye
+            const separator = previewUrl.includes('?') ? '&' : '?';
+            const cacheBustedUrl = `${previewUrl}${separator}cb=${Date.now()}`;
+            setCleanUrl(cacheBustedUrl);
         }
-    }, [previewUrl, isPdf]);
+    }, [previewUrl, isPdf, visible]);
 
     if (!visible || !previewUrl) return null;
 
@@ -58,7 +71,7 @@ export default function AttachmentPreviewWebView({
         if (!previewUrl) return;
 
         try {
-            setDownloading(true); // show loader
+            setDownloading(true);
 
             const fileExt = previewUrl.split('.').pop();
             const fileName = `file_${Date.now()}.${fileExt}`;
@@ -88,9 +101,18 @@ export default function AttachmentPreviewWebView({
             console.log('Download error:', err);
             Alert.alert('Download Failed', 'Unable to download file.');
         } finally {
-            setDownloading(false); // hide loader
+            setDownloading(false);
         }
     };
+
+    // 🔹 Clean close handler taake states instant flush hon 
+    const handleClose = () => {
+        setLoading(true);
+        setCleanUrl(null);
+        setLocalPath(null);
+        onClose();
+    };
+
     return (
         <Modal visible={visible} animationType="slide" transparent={false}>
             <SafeAreaView style={{ flex: 1, backgroundColor: themes.white }}>
@@ -99,9 +121,9 @@ export default function AttachmentPreviewWebView({
 
                 {/* Header */}
                 <View style={[styles.headerContainer,
-                { height: Platform.OS === 'android' && 50, paddingTop: Platform.OS == 'ios' && verticalScale(50) }]}>
+                { height: Platform.OS === 'android' && verticalScale(50), paddingTop: Platform.OS == 'ios' && verticalScale(cleanUrl ? 0 : 50) }]}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                        <TouchableOpacity onPress={onClose} style={styles.headerButton}>
+                        <TouchableOpacity onPress={handleClose} style={styles.headerButton}>
                             <CloseIcon width={24} height={24} color={themes.darkText} />
                         </TouchableOpacity>
 
@@ -146,18 +168,25 @@ export default function AttachmentPreviewWebView({
                         )
                     ) : (
                         /* 🖼 Image */
-                        <Image
-                            source={{ uri: previewUrl }}
-                            style={{
-                                flex: 1,
-                                width: '100%',
-                                resizeMode: 'contain',
-                                backgroundColor: themes.white
-                            }}
-                            onLoadStart={() => setLoading(true)}   // 🔥 important
-                            onLoadEnd={() => setLoading(false)}
-                            onError={() => setLoading(false)}
-                        />
+                        cleanUrl && (
+                            <Image
+                                key={cleanUrl}
+                                source={{
+                                    uri: cleanUrl,
+                                    // 🔹 Force native layers to fetch a fresh request instead of local memory cache
+                                    cache: 'reload'
+                                }}
+                                style={{
+                                    flex: 1,
+                                    width: '100%',
+                                    resizeMode: 'contain',
+                                    backgroundColor: themes.white
+                                }}
+                                onLoadStart={() => setLoading(true)}
+                                onLoadEnd={() => setLoading(false)}
+                                onError={() => setLoading(false)}
+                            />
+                        )
                     )}
 
                 </View>
@@ -174,7 +203,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingHorizontal: 12,
-        borderBottomWidth: 1, 
+        borderBottomWidth: 1,
         borderBottomColor: '#ddd',
         backgroundColor: themes.white,
     },

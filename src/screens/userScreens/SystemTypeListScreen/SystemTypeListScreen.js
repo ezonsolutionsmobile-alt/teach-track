@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { View, StyleSheet, FlatList } from 'react-native';
+import { View, StyleSheet, FlatList, Platform } from 'react-native';
 import CustomHeader from '../../../components/CustomHeader';
 import CustomDropdownButton from '../../../components/CustomDropdownButton';
 import MainBox from '../../../components/MainBox';
@@ -12,6 +12,7 @@ import CustomStatusBar from '../../../components/CustomStatusBar';
 import { useThemeStore } from '../../../store/useThemeStore';
 import useAcademicFlowStore from '../../../store/useAcademicFlowStore';
 import { useTabStore } from '../../../store/useTabStore';
+import { DashedBorder } from '../../../assets/Icons';
 
 
 export default function SystemTypeListScreen({ route }) {
@@ -74,6 +75,11 @@ export default function SystemTypeListScreen({ route }) {
                                 {campusShiftItem?.campus_shift_name}
                             </AppText>
                         </View>
+                        {Platform.OS === 'ios' &&
+                            <View style={{ marginBottom: verticalScale(8), paddingTop: verticalScale(12), }}>
+                                <DashedBorder color={theme?.theme?.medium_text} />
+                            </View> 
+                        }
                         <View style={{ paddingHorizontal: 8, paddingBottom: 44 }}>
 
                             {/* FlatList of campus shifts */}
@@ -100,11 +106,16 @@ const styles = StyleSheet.create({
         backgroundColor: themes?.white,
     },
     headingContainer: {
-        paddingBottom: 12,
-        borderBottomWidth: 1,
-        borderStyle: 'dashed',
-        marginBottom: 8,
         alignItems: 'center',
+        ...Platform.select({
+            android: {
+                marginBottom: verticalScale(8),
+                paddingBottom: verticalScale(12),
+                borderBottomWidth: 1,
+                borderStyle: 'dashed',
+                borderBottomColor: themes?.borderGrey,
+            },
+        }),
     },
 
 });

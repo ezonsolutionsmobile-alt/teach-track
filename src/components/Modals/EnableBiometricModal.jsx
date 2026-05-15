@@ -5,6 +5,7 @@ import {
     StyleSheet,
     Animated,
     TouchableOpacity,
+    Platform, // 👈 Platform import kiya check karne ke liye
 } from 'react-native';
 import { moderateScale, scale, verticalScale } from '../../themes/sizes';
 import AppText from '../AppText';
@@ -39,6 +40,13 @@ const EnableBiometricModal = ({
         }
     }, [visible]);
 
+    // 🌟 Android aur iOS ke liye dynamic text setup
+    const isIOS = Platform.OS === 'ios';
+    const titleText = isIOS ? 'Enable Face ID / Touch ID' : 'Enable Biometric Login';
+    const messageText = isIOS 
+        ? 'Setup Face ID or Touch ID for a faster and more secure login experience.' 
+        : 'Setup Fingerprint or Biometric authentication for a faster and more secure login experience.';
+
     return (
         <Modal transparent visible={visible} animationType="none">
             <View style={styles.overlay}>
@@ -51,37 +59,38 @@ const EnableBiometricModal = ({
                         },
                     ]}
                 >
-                    {/* ICON SECTION (Safe/Shield Icon feel) */}
+                    {/* ICON SECTION */}
                     <View style={[styles.iconWrapper, { backgroundColor: '#E0F2FE' }]}>
                         <AppText style={{ fontSize: moderateScale(24) }}>🛡️</AppText>
                     </View>
 
-                    {/* TITLE */}
+                    {/* DYNAMIC TITLE */}
                     <AppText weight='Bold' style={[styles.title, { color: theme?.theme?.dark_text }]}>
-                        Enable Biometric Login
+                        {titleText}
                     </AppText>
 
-                    {/* MESSAGE */}
+                    {/* DYNAMIC MESSAGE */}
                     <AppText style={styles.message}>
-                        Setup Fingerprint or Face ID for a faster and more secure login experience.
+                        {messageText}
                     </AppText>
 
                     {/* BUTTONS */}
                     <View style={styles.buttonRow}>
-                        <TouchableOpacity
-                            style={styles.skipBtn}
-                            onPress={onSkip}
-                            activeOpacity={0.7}
-                        >
-                            <AppText weight='Medium' style={styles.skipText}>Maybe Later</AppText>
-                        </TouchableOpacity>
-
+                        {/* Primary Button (Enable) upar kar diya standard UI ke liye */}
                         <TouchableOpacity
                             style={[styles.enableBtn, { backgroundColor: theme?.theme?.primary || '#0EA5E9' }]}
                             onPress={onEnable}
                             activeOpacity={0.7}
                         >
                             <AppText weight='Bold' style={styles.enableText}>Enable Now</AppText>
+                        </TouchableOpacity>
+
+                        <TouchableOpacity
+                            style={styles.skipBtn}
+                            onPress={onSkip}
+                            activeOpacity={0.7}
+                        >
+                            <AppText weight='Medium' style={styles.skipText}>Maybe Later</AppText>
                         </TouchableOpacity>
                     </View>
                 </Animated.View>
@@ -132,7 +141,7 @@ const styles = StyleSheet.create({
         lineHeight: verticalScale(18),
     },
     buttonRow: {
-        flexDirection: 'column', // Stacked buttons for better focus
+        flexDirection: 'column',
         width: '100%',
     },
     enableBtn: {
