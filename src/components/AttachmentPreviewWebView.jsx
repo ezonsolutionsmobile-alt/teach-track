@@ -119,9 +119,9 @@ export default function AttachmentPreviewWebView({
 
                 <StatusBar barStyle="dark-content" backgroundColor={themes.white} />
 
-                {/* Header */}
+                {/* Header */} 
                 <View style={[styles.headerContainer,
-                { height: Platform.OS === 'android' && verticalScale(50), paddingTop: Platform.OS == 'ios' && verticalScale(cleanUrl ? 0 : 50) }]}>
+                { height: Platform.OS === 'android' && verticalScale(50), paddingTop: Platform.OS == 'ios' && verticalScale(50) }]}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
                         <TouchableOpacity onPress={handleClose} style={styles.headerButton}>
                             <CloseIcon width={24} height={24} color={themes.darkText} />
