@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     Platform, // 👈 Platform import kiya check karne ke liye
 } from 'react-native';
-import { moderateScale, scale, verticalScale } from '../../themes/sizes';
+import { moderateScale, verticalScale } from '../../themes/sizes';
 import AppText from '../AppText';
 import { useThemeStore } from '../../store/useThemeStore';
 

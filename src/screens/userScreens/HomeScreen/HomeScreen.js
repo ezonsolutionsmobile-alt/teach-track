@@ -12,6 +12,7 @@ import { useThemeStore } from '../../../store/useThemeStore';
 import { attendance, checkInOut, homework } from '../../../assets';
 import { scale } from '../../../themes/sizes';
 import { useTabStore } from '../../../store/useTabStore';
+import themes from '../../../themes/colors';
 
 
 
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
     paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
-    backgroundColor: '#f2f2f2',
+    backgroundColor: themes?.off_white,
   },
   listContainer: {
     paddingVertical: 10,
