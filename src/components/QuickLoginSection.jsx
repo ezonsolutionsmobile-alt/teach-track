@@ -27,15 +27,7 @@ const QuickLoginSection = ({ onEnable, isEnabled, setIsEnabled }) => {
         loadStatus();
     }, []);
 
-    const toggleSwitch = async () => {
-        try {
-            const newValue = !isEnabled;
-            setIsEnabled(newValue);
-            await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newValue));
-        } catch (e) {
-            console.log("Error saving quick login status", e);
-        }
-    };
+   
     if (!isEnabled) return null
     return (
         <View style={styles.container}>
