@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
         paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
-        backgroundColor: themes.white,
+        backgroundColor: themes.off_white,
     },
     headingContainer: {
         borderBottomColor: themes.mediumText,
@@ -353,13 +353,7 @@ const styles = StyleSheet.create({
 
     fixedButtonContainer: {
         position: 'absolute',
-        ...Platform.select({
-            android: {
-                bottom: 10,
-            },ios: {
-                bottom: 0,
-            }
-        }),
+        bottom: 10,
         left: 16,
         right: 16,
         zIndex: 10,

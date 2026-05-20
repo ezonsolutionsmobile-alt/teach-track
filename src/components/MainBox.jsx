@@ -21,21 +21,19 @@ const MainBox = ({
     return (
       <View
         style={[
-          styles.wrapper,
+          styles.wrapper, // 🔥 Ab shadow wrapper pe apply hogi
           {
             width,
             height: height === 'auto' ? undefined : height,
             maxHeight,
-            backgroundColor,
-            borderRadius,
-            paddingHorizontal,
-            paddingVertical,
-            flex: 1,
           },
           style,
         ]}
       >
-        {children}
+        {/* 🔥 Inner container jo background, radius aur overflow handle karega */}
+        <View style={{ backgroundColor, borderRadius, overflow: 'hidden', flex: 1, paddingHorizontal, paddingVertical }}>
+          {children}
+        </View>
       </View>
     );
   }
@@ -78,25 +76,26 @@ const MainBox = ({
 
     <View
       style={[
-        styles.wrapper,
+        styles.wrapper, // 🔥 Ab shadow wrapper pe apply hogi
         {
           width,
           height: height === 'auto' ? undefined : height,
           maxHeight,
-          backgroundColor,
-          borderRadius,
         },
         style,
       ]}
     >
-      {/* 🔥 ScrollView ko yahan se hata dein */}
-      <View
-        style={{
-          paddingHorizontal,
-          paddingVertical,
-        }}
-      >
-        {children}
+      {/* 🔥 Inner container jo background, radius aur overflow handle karega */}
+      <View style={{ backgroundColor, borderRadius, overflow: 'hidden' }}>
+        {/* 🔥 ScrollView ko yahan se hata dein */}
+        <View
+          style={{
+            paddingHorizontal,
+            paddingVertical,
+          }}
+        >
+          {children}
+        </View>
       </View>
     </View>
   );
@@ -107,14 +106,18 @@ export default MainBox;
 const styles = StyleSheet.create({
   wrapper: {
     // alignSelf: 'center',
-    overflow: 'hidden',
+    
     // iOS shadow
     shadowColor: '#292D34',
-    shadowOffset: { width: 1, height: -1 },
+    shadowOffset: { width: 1, height: 1 }, // 🔥 -1 ki jagah 1 kiya taaki shadow bahaar dikhe
     shadowOpacity: 0.14,
     shadowRadius: 8,
 
     // Android shadow
     elevation: 6,
+    
+    // 🔥 iOS shadow k leye zaroori properties
+    backgroundColor: 'transparent', 
+    overflow: 'visible', 
   },
 });

@@ -13,6 +13,7 @@ import themes from "../../../themes/colors";
 import * as Keychain from 'react-native-keychain';
 import { useIsFocused } from "@react-navigation/native";
 import ConfirmationModal from '../../../components/Modals/ConfirmationModal';
+import globalStyles from "../../../themes/globalStyles";
 
 export const STORAGE_KEY = "@quick_login_enabled_employee";
 export const APP_BIOMETRIC_KEY = "employeeAppBiometric";
@@ -32,11 +33,11 @@ const SettingsScreen = ({ navigation }) => {
             try {
                 const value = await AsyncStorage.getItem(STORAGE_KEY);
                 const credentials = await Keychain.getGenericPassword({ service: APP_BIOMETRIC_KEY });
-                
+
                 if (value !== null) {
                     setIsEnabled(value === "true");
                 }
-                
+
                 // Production Safe Check: Agar token keychain me nahi hai, toh settings disable rakhein
                 if (!credentials) {
                     setDisabled(true);
@@ -102,7 +103,7 @@ const SettingsScreen = ({ navigation }) => {
         try {
             await Keychain.resetGenericPassword({ service: APP_BIOMETRIC_KEY }); // Service targeting
             await AsyncStorage.removeItem(STORAGE_KEY);
-            
+
             setIsEnabled(false);
             setDisabled(true);
             setConfirmVisible(false);
@@ -192,7 +193,7 @@ const SettingsScreen = ({ navigation }) => {
                             btnStyle={{ backgroundColor: themes?.redText || "#D32F2F", marginTop: verticalScale(15) }}
                             disabled={disabled}
                         />
-                        
+
                         {disabled && (
                             <AppText
                                 weight="Medium"
@@ -228,7 +229,9 @@ export default SettingsScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: scale(12),
+        paddingHorizontal: globalStyles?.mainBoxWrapper?.paddingHorizontal,
+        paddingVertical: globalStyles?.mainBoxWrapper?.paddingVertical,
+        backgroundColor: themes.off_white,
     },
     card: {
         paddingVertical: verticalScale(14),
