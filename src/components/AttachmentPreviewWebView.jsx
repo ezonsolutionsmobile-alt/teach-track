@@ -8,7 +8,9 @@ import {
     Image,
     ActivityIndicator,
     Platform,
-    ToastAndroid, Alert
+    ToastAndroid, Alert,
+    Share,
+    PermissionsAndroid
 } from 'react-native';
 import AppText from './AppText';
 import { CloseIcon } from '../assets/Icons';
@@ -67,44 +69,215 @@ export default function AttachmentPreviewWebView({
 
     if (!visible || !previewUrl) return null;
 
+    // const handleDownload = async () => {
+    //     if (!previewUrl) return;
+
+    //     try {
+    //         setDownloading(true);
+
+    //         const fileExt = previewUrl.split('.').pop();
+    //         const fileName = `file_${Date.now()}.${fileExt}`;
+    //         const dirs = RNFetchBlob.fs.dirs;
+
+    //         let path = Platform.OS === 'android'
+    //             ? `${dirs.DownloadDir}/${fileName}`
+    //             : `${dirs.DocumentDir}/${fileName}`;
+
+    //         await RNFetchBlob.config({
+    //             fileCache: true,
+    //             addAndroidDownloads: {
+    //                 useDownloadManager: true,
+    //                 notification: true,
+    //                 path: path,
+    //                 description: 'File downloaded by app',
+    //             },
+    //         }).fetch('GET', previewUrl);
+
+    //         if (Platform.OS === 'android') {
+    //             ToastAndroid.show('File downloaded to Downloads', ToastAndroid.SHORT);
+    //         } else {
+    //             Alert.alert('Download', `File saved to Documents:\n${path}`);
+    //         }
+
+    //     } catch (err) {
+    //         console.log('Download error:', err);
+    //         Alert.alert('Download Failed', 'Unable to download file.');
+    //     } finally {
+    //         setDownloading(false);
+    //     }
+    // };
+
+    const requestStoragePermission = async () => {
+        if (Platform.OS !== 'android') return true;
+
+        // Android 10 (API 29) aur usse neeche ke liye permission chahiye hoti hai
+        if (Platform.Version <= 29) {
+            try {
+                const granted = await PermissionsAndroid.request(
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    {
+                        title: 'Storage Permission Required',
+                        message: 'App ko file save karne ke liye storage permission chahiye.',
+                        buttonNeutral: 'Ask Me Later',
+                        buttonNegative: 'Cancel',
+                        buttonPositive: 'OK',
+                    },
+                );
+                return granted === PermissionsAndroid.RESULTS.GRANTED;
+            } catch (err) {
+                console.warn(err);
+                return false;
+            }
+        }
+
+        // Android 11+ (API 30+) par Scoped Storage ki wajah se Download Manager ko permission nahi chahiye hoti
+        return true;
+    };
+
+
+    // 🛠️ HELPER 1: URL se clean extension aur fileName generate karne ke liye
+    const getFileExtensionAndName = (url, isPdf) => {
+        const encodedUrl = encodeURI(url);
+        const cleanUrlForExt = encodedUrl.split('?')[0];
+        let fileExt = cleanUrlForExt.split('.').pop()?.toLowerCase();
+
+        // Extension validation and smart fallback
+        if (!fileExt || fileExt.length > 5 || fileExt.includes('/')) {
+            if (isPdf) {
+                fileExt = 'pdf';
+            } else if (url?.toLowerCase().includes('png')) {
+                fileExt = 'png';
+            } else if (url?.toLowerCase().includes('jpeg') || url?.toLowerCase().includes('jpg')) {
+                fileExt = 'jpg';
+            } else {
+                fileExt = 'bin';
+            }
+        }
+
+        return {
+            encodedUrl,
+            fileExt,
+            fileName: `Attachment_${Date.now()}.${fileExt}`
+        };
+    };
+
+    // 🛠️ HELPER 2: Android Scoped Storage + Notification Flow
+    const downloadAndroid = async (encodedUrl, fileName, fileExt) => {
+        const dirs = RNFetchBlob.fs.dirs;
+        const detectedMime = fileExt === 'pdf' ? 'application/pdf' : `image/${fileExt}`;
+
+        const tempPath = `${dirs.CacheDir}/${fileName}`;
+        const publicDownloadsDir = '/storage/emulated/0/Download';
+        const targetPath = `${publicDownloadsDir}/${fileName}`;
+
+        // 1. App Cache mein download karein
+        const res = await RNFetchBlob.config({
+            fileCache: true,
+            path: tempPath
+        }).fetch('GET', encodedUrl);
+
+        if (res.info().status >= 400) {
+            throw new Error(`Server returned status: ${res.info().status}`);
+        }
+
+        // 2. Check & Create Public Download folder
+        const isDir = await RNFetchBlob.fs.isDir(publicDownloadsDir);
+        if (!isDir) {
+            await RNFetchBlob.fs.mkdir(publicDownloadsDir);
+        }
+
+        // 3. Move file to Public Downloads
+        await RNFetchBlob.fs.cp(tempPath, targetPath);
+
+        // 4. Cleanup Cache safely
+        try {
+            await RNFetchBlob.fs.unlink(tempPath);
+        } catch (e) {
+            console.log('Cache cleanup skipped:', e);
+        }
+
+        // 5. Media Scanner Run Karein (Pixel/Android Fix)
+        await RNFetchBlob.fs.scanFile([{ path: targetPath, mime: detectedMime }]);
+
+        // 6. Push Native Notification Bar Item
+        try {
+            if (RNFetchBlob.android) {
+                RNFetchBlob.android.addCompleteDownload({
+                    title: fileName,
+                    description: 'Download Complete',
+                    mime: detectedMime,
+                    path: targetPath,
+                    showNotification: true,
+                });
+            }
+        } catch (notificationError) {
+            console.log('Notification trigger error:', notificationError);
+        }
+
+        ToastAndroid.show('File saved to public Downloads', ToastAndroid.SHORT);
+    };
+
+    // 🛠️ HELPER 3: iOS Storage + Share Sheet Flow
+    const downloadIOS = async (encodedUrl, fileName, fileExt) => {
+        const dirs = RNFetchBlob.fs.dirs;
+        const finalIosPath = `${dirs.DocumentDir}/${fileName}`;
+
+        const res = await RNFetchBlob.config({
+            fileCache: true,
+            path: finalIosPath
+        }).fetch('GET', encodedUrl);
+
+        if (res.info().status >= 400) {
+            throw new Error(`Server returned status: ${res.info().status}`);
+        }
+
+        const fileExists = await RNFetchBlob.fs.exists(finalIosPath);
+        if (!fileExists) {
+            throw new Error("File creation failed on disk");
+        }
+
+        const mimeType = fileExt === 'pdf' ? 'application/pdf' : `image/${fileExt}`;
+        await Share.share({
+            url: `file://${finalIosPath}`,
+            type: mimeType,
+            title: fileName
+        });
+    };
+
+    // 🚀 MAIN FUNCTION: Jo button click par chalega (Ab yeh bilkul clean hai!)
     const handleDownload = async () => {
         if (!previewUrl) return;
+
+        // 1. Permission Check
+        const hasPermission = await requestStoragePermission();
+        if (!hasPermission) {
+            Alert.alert('Permission Denied', 'Storage permission ke bina file save nahi ho sakti.');
+            return;
+        }
 
         try {
             setDownloading(true);
 
-            const fileExt = previewUrl.split('.').pop();
-            const fileName = `file_${Date.now()}.${fileExt}`;
-            const dirs = RNFetchBlob.fs.dirs;
+            // 2. Parse URL and get details
+            const { encodedUrl, fileName, fileExt } = getFileExtensionAndName(previewUrl, isPdf);
 
-            let path = Platform.OS === 'android'
-                ? `${dirs.DownloadDir}/${fileName}`
-                : `${dirs.DocumentDir}/${fileName}`;
-
-            await RNFetchBlob.config({
-                fileCache: true,
-                addAndroidDownloads: {
-                    useDownloadManager: true,
-                    notification: true,
-                    path: path,
-                    description: 'File downloaded by app',
-                },
-            }).fetch('GET', previewUrl);
-
+            // 3. Platform wise execution
             if (Platform.OS === 'android') {
-                ToastAndroid.show('File downloaded to Downloads', ToastAndroid.SHORT);
+                await downloadAndroid(encodedUrl, fileName, fileExt);
             } else {
-                Alert.alert('Download', `File saved to Documents:\n${path}`);
+                await downloadIOS(encodedUrl, fileName, fileExt);
             }
 
         } catch (err) {
-            console.log('Download error:', err);
-            Alert.alert('Download Failed', 'Unable to download file.');
+            console.log('Production Download Error:', err);
+            Alert.alert(
+                'Download Failed',
+                'File download nahi ho saki. Koshish karein ke aapka internet theek ho.'
+            );
         } finally {
             setDownloading(false);
         }
     };
-
     // 🔹 Clean close handler taake states instant flush hon 
     const handleClose = () => {
         setLoading(true);
@@ -114,12 +287,13 @@ export default function AttachmentPreviewWebView({
     };
 
     return (
-        <Modal visible={visible} animationType="slide" transparent={false}>
-            <SafeAreaView style={{ flex: 1, backgroundColor: themes.white }}>
+        <>
+            <StatusBar barStyle="dark-content" backgroundColor={themes.white} />
+            <Modal visible={visible} animationType="slide" transparent={false}>
+                {/* <SafeAreaView style={{ flex: 1, backgroundColor: themes.white }}> */}
 
-                <StatusBar barStyle="dark-content" backgroundColor={themes.white} />
 
-                {/* Header */} 
+                {/* Header */}
                 <View style={[styles.headerContainer,
                 { height: Platform.OS === 'android' && verticalScale(50), paddingTop: Platform.OS == 'ios' && verticalScale(50) }]}>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
@@ -190,9 +364,10 @@ export default function AttachmentPreviewWebView({
                     )}
 
                 </View>
-            </SafeAreaView>
+                {/* </SafeAreaView> */}
 
-        </Modal>
+            </Modal>
+        </>
     );
 }
 

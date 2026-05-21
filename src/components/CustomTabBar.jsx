@@ -9,6 +9,7 @@ import AppText from './AppText';
 import { getTabLabel } from '../utils/getTabLabel';
 import { useThemeStore } from '../store/useThemeStore';
 import { useTabStore } from '../store/useTabStore';
+import { StackActions } from '@react-navigation/native';
 
 const ICONS = {
   Dashboard: DashboardIcon,
@@ -19,7 +20,7 @@ const ICONS = {
 const CustomTabBar = ({ state, navigation }) => {
   const { theme } = useThemeStore();
   const insets = useSafeAreaInsets();
-  const { activeTab, setActiveTab, lastHomeScreen, setLastHomeScreen, lastTopBarScreen } = useTabStore();
+  const { activeTab, setActiveTab, lastHomeScreen, setLastHomeScreen, lastTopBarScreen, setLastTopBarScreen } = useTabStore();
   const lastPressRef = useRef({});
   // HomeStack should appear active if either HomeStack or FeeStack is active
 
@@ -38,39 +39,148 @@ const CustomTabBar = ({ state, navigation }) => {
             : (state.index === index || (route.name == "HomeStack" && activeTab == "HomeworkTopTabStack"));
           const IconComponent = ICONS[route.name];
 
+          // const onPress = () => {
+          //   if (route.name === 'Dashboard') {
+          //     setActiveTab('Dashboard');
+          //     navigation.navigate('Dashboard');
+          //     return;
+          //   }
+
+          //   // last tested code 
+          //   if (route.name === 'HomeStack') {
+          //     setActiveTab('HomeStack');
+          //     if (lastTopBarScreen) {
+          //       navigation.navigate('HomeworkTopTabStack', {
+          //         screen: 'Add',
+          //       });
+          //     } else {
+          //       // Always go to last home screen or default
+          //       navigation.navigate('HomeStack', {
+          //         screen: lastHomeScreen || 'HomeScreen',
+          //       });
+          //     }
+          //     return;
+          //   }
+
+
+          //   else if (route.name === 'ProfileStack') {
+          //     setActiveTab('ProfileStack');
+
+          //     navigation.navigate('ProfileStack', {
+          //       screen: 'ProfileScreen',
+          //     });
+
+          //     return;
+          //   }
+          //   setActiveTab(route.name);
+          //   navigation.navigate(route.name);
+          // };
+
           const onPress = () => {
+            // ==========================================
+            // CASE 1: Dashboard Tab Clicked
+            // ==========================================
             if (route.name === 'Dashboard') {
               setActiveTab('Dashboard');
               navigation.navigate('Dashboard');
               return;
             }
 
+            // ==========================================
+            // CASE 2: HomeStack Tab Clicked
+            // ==========================================
             if (route.name === 'HomeStack') {
+              const previousTab = activeTab;
               setActiveTab('HomeStack');
-              if (lastTopBarScreen) {
-                navigation.navigate('HomeworkTopTabStack', {
-                  screen: 'Add',
-                });
-              } else {
-                // Always go to last home screen or default
-                navigation.navigate('HomeStack', {
-                  screen: lastHomeScreen || 'HomeScreen',
-                });
+
+              const fullState = navigation.getState();
+              const homeRoute = fullState.routes.find(r => r.name === 'HomeStack');
+              const stackState = homeRoute?.state;
+
+              // SUB-CASE A: Agar user abhi HomeworkTopTabStack par khada hai
+              if (previousTab === 'HomeworkTopTabStack') {
+                setLastTopBarScreen(null);
+                navigation.navigate('HomeStack', { screen: 'SubjectListScreen' });
+                setLastHomeScreen('SubjectListScreen');
+                return;
               }
+
+              // SUB-CASE B: Agar user HomeStack ke andar nested screen par hai, to POP karein
+              if (stackState && stackState.index > 0 && previousTab === 'HomeStack') {
+                navigation.dispatch({
+                  ...StackActions.pop(1),
+                  target: stackState.key,
+                });
+                return;
+              }
+
+              // SUB-CASE C: USER ROOT SCREEN PAR HAI AUR DUBARA HOME TAP KIYA (Wapas Dashboard)
+              else if (previousTab === 'HomeStack') {
+                setActiveTab('Dashboard');
+                navigation.navigate('Dashboard');
+                return;
+              }
+
+              // =================================================================
+              // SUB-CASE D: FIXED LOGIC (Dashboard/Profile se pehli baar Home par aana)
+              // =================================================================
+              else {
+                if (lastTopBarScreen) {
+                  navigation.navigate('HomeworkTopTabStack', { screen: 'Add' });
+                } else {
+                  // Agar pehle se stack ki koi state maujood hai (yaani nested screens hain)
+                  // to sirf stack ka naam bhejain, taaki exact wahi screen khule jahan choda tha!
+                  if (stackState) {
+                    navigation.navigate('HomeStack');
+                  } else {
+                    // Agar state nahi hai (app fresh khuli hai) tab fallback lagayein
+                    navigation.navigate('HomeStack', {
+                      screen: lastHomeScreen || 'HomeScreen',
+                    });
+                  }
+                }
+              }
+
               return;
             }
+
+            // ==========================================
+            // CASE 3: ProfileStack Tab Clicked
+            // ==========================================
             else if (route.name === 'ProfileStack') {
+              const previousTab = activeTab;
               setActiveTab('ProfileStack');
 
-              navigation.navigate('ProfileStack', {
-                screen: 'ProfileScreen',
-              });
+              const fullState = navigation.getState();
+              const profileRoute = fullState.routes.find(r => r.name === 'ProfileStack');
+              const stackState = profileRoute?.state;
+
+              if (stackState && stackState.index > 0 && previousTab === 'ProfileStack') {
+                navigation.dispatch({
+                  ...StackActions.pop(1),
+                  target: stackState.key,
+                });
+                return;
+              }
+              else if (previousTab === 'ProfileStack') {
+                setActiveTab('Dashboard');
+                navigation.navigate('Dashboard');
+                return;
+              }
+              else {
+                navigation.navigate('ProfileStack');
+              }
 
               return;
             }
+
+            // ==========================================
+            // CASE 4: Default Fallback
+            // ==========================================
             setActiveTab(route.name);
             navigation.navigate(route.name);
           };
+
 
           const color = isFocused
             ? theme?.theme?.primary

@@ -97,5 +97,10 @@
 	<string>This app needs access to camera to take photos.</string>
 	<key>NSFaceIDUsageDescription</key>
     <string>This app requires Face ID permission for secure login.</string>
+	<key>UIFileSharingEnabled</key>
+   <true/>
+
+   <key>LSSupportsOpeningDocumentsInPlace</key>
+   <true/>
 </dict>
 </plist>
