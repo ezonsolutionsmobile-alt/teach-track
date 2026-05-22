@@ -86,7 +86,7 @@ const SettingsScreen = ({ navigation }) => {
                 }
 
                 // 2. State update aur storage save
-                setIsEnabled(true);
+                setIsEnabled(newValue);
                 await AsyncStorage.setItem(STORAGE_KEY, "true");
             } else {
                 // Turn off flow
@@ -172,7 +172,7 @@ const SettingsScreen = ({ navigation }) => {
                             </View>
 
                             {/* SWITCH */}
-                            <Switch
+                            {/* <Switch
                                 value={isEnabled}
                                 disabled={disabled}
                                 onValueChange={toggleBiometric}
@@ -181,6 +181,18 @@ const SettingsScreen = ({ navigation }) => {
                                     true: theme?.theme?.primary || "#4CAF50",
                                 }}
                                 thumbColor="#FFFFFF"
+                                style={styles.switchStyle}
+                            /> */}
+                            <Switch
+                                trackColor={{
+                                    false: "#D1D1D1",
+                                    true: theme?.theme?.primary || "#4CAF50",
+                                }}
+                                thumbColor={isEnabled ? themes?.lightPurple : '#f4f3f4'}
+                                ios_backgroundColor="#3e3e3e"
+                                onValueChange={toggleBiometric}
+                                value={isEnabled}
+                                disabled={disabled}
                                 style={styles.switchStyle}
                             />
                         </View>
