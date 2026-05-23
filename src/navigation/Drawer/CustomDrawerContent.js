@@ -25,9 +25,10 @@ import { useTabStore } from '../../store/useTabStore';
 import { useApiRoutesStore } from '../../store/useApiRoutesStore';
 import AppText from '../../components/AppText';
 import { useThemeStore } from '../../store/useThemeStore';
-import { attendance, checkInOut, homework, user_avatar } from '../../assets';
+import { attendance, checkInOut, homework,  } from '../../assets';
 import { useScreenNavigationStore } from '../../store/useScreenNavigationStore';
 import { moderateScale, verticalScale } from '../../themes/sizes';
+import AvatarInitials from '../../components/AvatarInitials';
 
 export default function CustomDrawerContent({ navigation }) {
   const { assetRoutes, routes } = useApiRoutesStore()
@@ -91,14 +92,13 @@ export default function CustomDrawerContent({ navigation }) {
       ],
     });
   };
-  // console.log(activeTab, "aksjkjhad", lastHomeScreen, "ahgsdjkjskjdhakjshd", activeRoute, "activeRoute",itemData?.type)
   return (
 
     <View style={styles.container}>
       {/* HEADER */}
       <View style={styles.header}>
         {/* Profile Image */}
-        <Image
+        {/* <Image
           source={
             user?.img && user?.img !== ""
               ? { uri: "https://i.pravatar.cc/300" }
@@ -107,8 +107,20 @@ export default function CustomDrawerContent({ navigation }) {
               user_avatar
           }
           style={styles.avatar}
-        />
-
+        /> */}
+        {user?.img && user?.img.trim() !== "" ? (
+          <Image
+            source={{ uri: `${assetRoutes?.parent_images}/${user.img}` }}
+            style={styles.avatar}
+          />
+        ) : (
+          <AvatarInitials
+            firstName={user?.f_name}
+            lastName={user?.l_name}
+            theme={theme}
+            avatarStyle={styles.avatar}
+          />
+        )}
         {/* Name & Email */}
         <View style={styles.profileInfo}>
           <AppText weight="Bold" style={{ textTransform: 'capitalize', fontSize: moderateScale(theme?.text_font_size?.large) }} color={"#fff"}>
@@ -150,7 +162,7 @@ export default function CustomDrawerContent({ navigation }) {
         <DrawerMenuItem
           label="Attendance"
           icon={AttendanceIcon}
-          isActive={(activeTab == "HomeStack" ||activeRoute === 'CampusShiftScreen') && itemData?.type == "attendance"}
+          isActive={(activeTab == "HomeStack" || activeRoute === 'CampusShiftScreen') && itemData?.type == "attendance"}
           onPress={() => {
 
             setNavigationData('attendance', { id: 3, title: "Attendance", bg: "#3B5998", url: "CampusShiftScreen", type: "attendance", image: attendance },);

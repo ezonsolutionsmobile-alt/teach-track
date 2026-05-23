@@ -21,6 +21,7 @@ import { useThemeStore } from "../../../store/useThemeStore";
 import { useApiRoutesStore } from "../../../store/useApiRoutesStore";
 import { user_avatar } from "../../../assets";
 import { useTabStore } from "../../../store/useTabStore";
+import AvatarInitials from '../../../components/AvatarInitials';
 
 
 export default function ProfileScreen() {
@@ -104,7 +105,7 @@ export default function ProfileScreen() {
                 // source={{ uri: `${baseURL}/${user?.img}` }}
                 style={styles.avatar}
               /> */}
-            <Image
+            {/* <Image
               source={
                 user?.img && user?.img !== ""
                   ? { uri: "https://i.pravatar.cc/300" }
@@ -113,7 +114,21 @@ export default function ProfileScreen() {
                   user_avatar
               }
               style={styles.avatar}
-            />
+            /> */}
+               {user?.img && user?.img.trim() !== "" ? (
+              <Image
+                source={{ uri: `${assetRoutes?.parent_images}/${user.img}` }}
+                style={styles.avatar}
+              />
+            ) : (
+              <AvatarInitials
+                firstName={user?.f_name}
+                lastName={user?.l_name}
+                theme={theme}
+                avatarStyle={styles.avatar}
+                borderColor={theme?.theme?.primary}
+              />
+            )}
             {/* </TouchableOpacity> */}
             <View>
               <AppText weight="Bold" style={{ textTransform: 'capitalize', fontSize: moderateScale(theme?.text_font_size?.large) }} color={theme?.theme?.dark_Text}>

@@ -15,6 +15,7 @@ import MainBox from "../../../components/MainBox";
 import globalStyles from "../../../themes/globalStyles";
 import { useApiRoutesStore } from "../../../store/useApiRoutesStore";
 import { user_avatar } from "../../../assets";
+import AvatarInitials from "../../../components/AvatarInitials";
 
 
 
@@ -95,10 +96,20 @@ export default function ProfileDetailsScreen() {
 
         {/* Fixed Profile Card */}
         <View style={styles.profileCard}>
-          <Image
-            //  source={{ uri: 'https://i.pravatar.cc/300' }}
-            source={user_avatar}
-            style={styles?.avatar} />
+            {user?.img && user?.img.trim() !== "" ? (
+              <Image
+                source={{ uri: `${assetRoutes?.parent_images}/${user.img}` }}
+                style={styles.avatar}
+              />
+            ) : (
+              <AvatarInitials
+                firstName={user?.f_name}
+                lastName={user?.l_name}
+                theme={theme}
+                avatarStyle={styles.avatar}
+                borderColor={theme?.theme?.primary}
+              />
+            )}
           <View>
             <AppText weight="Bold" style={{ textTransform: 'capitalize', fontSize: moderateScale(theme?.text_font_size?.large) }} color={theme?.theme?.dark_Text}>
               {user?.f_name} {user?.l_name}
