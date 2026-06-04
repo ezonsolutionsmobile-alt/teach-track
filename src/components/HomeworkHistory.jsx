@@ -4,7 +4,7 @@ import AppText from '../components/AppText';
 import AttachmentPreviewWebView from '../components/AttachmentPreviewWebView';
 import NoDataFound from '../components/NoDataFound';
 import themes from '../themes/colors';
-import { moderateScale, verticalScale, scale } from '../themes/sizes';
+import { moderateScale, verticalScale, scale, isTablet } from '../themes/sizes';
 import { EditIcon, DeleteIcon, FileIcon, CalendarIcon1 } from '../assets/Icons'; // <-- Eye icon imported
 import { useThemeStore } from '../store/useThemeStore';
 import { formatDate } from '../utils/formatDateType';
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     description: {
         // color: themes.darkText,
         marginTop: verticalScale(2),
-        lineHeight: 20,
+        lineHeight:isTablet() ? scale(24) : scale(20),
     },
 
     actions: {

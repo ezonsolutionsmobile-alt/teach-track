@@ -290,6 +290,7 @@ export default function AddHomeworkScreen() {
                                                                 value={value}
                                                                 onChangeText={onChange}
                                                                 multiline
+                                                                scrollEnabled={false}
                                                                 textAlignVertical="top"
                                                                 blurOnSubmit={false}
                                                                 returnKeyType="default"

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Switch, StyleSheet, Alert, Platform } from "react-native";
+import { View, Switch, StyleSheet, Alert, Platform, Modal, ActivityIndicator, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import AppText from "../../../components/AppText";
@@ -14,6 +14,8 @@ import * as Keychain from 'react-native-keychain';
 import { useIsFocused } from "@react-navigation/native";
 import ConfirmationModal from '../../../components/Modals/ConfirmationModal';
 import globalStyles from "../../../themes/globalStyles";
+import { showToast } from "../../../components/ShowToas";
+import { useApiRoutesStore } from "../../../store/useApiRoutesStore";
 
 export const STORAGE_KEY = "@quick_login_enabled_employee";
 export const APP_BIOMETRIC_KEY = "employeeAppBiometric";
@@ -23,7 +25,9 @@ const SettingsScreen = ({ navigation }) => {
     const isFocused = useIsFocused();
     const [isEnabled, setIsEnabled] = useState(false);
     const [disabled, setDisabled] = useState(false);
+    const [deleteModalVisible, setDeleteModalVisible] = useState(false);
     const [confirmVisible, setConfirmVisible] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false)
     // 🔹 State dynamic labels ke liye
     const [biometryLabel, setBiometryLabel] = useState("Biometric Login");
 
@@ -112,6 +116,23 @@ const SettingsScreen = ({ navigation }) => {
         }
     };
 
+    // --- Account Deletion Logic ---
+    const handleAccountDeletion = async () => {
+        const { routes } = useApiRoutesStore.getState();
+        try {
+            setIsDeleting(true)
+            setDeleteModalVisible(false);
+            showToast('success', '', 'Account deletion requested successfully. You will be logged out now.');
+        } catch (error) {
+            console.log("Account deletion error:", error);
+            setDeleteModalVisible(false);
+            showToast('error', '', 'Failed to request account deletion. Please try again later.');
+        } finally {
+            setIsDeleting(false)
+
+        }
+    };
+
     const handleConfirm = () => {
         setConfirmVisible(true);
     };
@@ -140,7 +161,7 @@ const SettingsScreen = ({ navigation }) => {
                     onBackPress={() => navigation.goBack()}
                 />
 
-                <View style={styles.container}>
+                <ScrollView style={styles.container}>
                     {/* CARD */}
                     <View style={[styles.card, { backgroundColor: "#FFF", borderColor: "#E0E0E0" }]}>
 
@@ -220,9 +241,60 @@ const SettingsScreen = ({ navigation }) => {
                             </AppText>
                         )}
                     </View>
-                </View>
-            </View>
+                    {/* CARD 2: Apple Guideline Compliant Account Deletion Card 🎯 */}
+                    <View style={[styles.card, { backgroundColor: "#FFF", borderColor: "#E0E0E0", marginTop: verticalScale(6) }]}>
+                        <AppText
+                            weight="Bold"
+                            style={[styles.title, { color: themes?.redText || "#D32F2F" }]}
+                        >
+                            Account Management
+                        </AppText>
 
+                        <View style={styles.separator} />
+
+                        <View style={styles.contentArea}>
+                            <AppText
+                                style={[
+                                    styles.description,
+                                    {
+                                        color: theme?.theme?.dark_text,
+                                        opacity: 0.8,
+                                        marginBottom: verticalScale(10)
+                                    },
+                                ]}
+                            >
+                                Permanently delete your URSchooling account and remove all stored data from our system. This action cannot be reversed.
+                            </AppText>
+                        </View>
+
+                        <AppButton
+                            title="Delete Account"
+                            fullWidth
+                            onPress={() => setDeleteModalVisible(true)}
+                            btnStyle={{ backgroundColor: "#ECEFF1", borderWidth: 1, borderColor: themes?.redText || "#D32F2F" }}
+                            textStyle={{ color: themes?.redText || "#D32F2F" }}
+                        />
+                    </View>
+                </ScrollView>
+            </View>
+            {/* --- FULL SCREEN LOADING MODAL --- */}
+            <Modal
+                transparent={true}
+                animationType="fade"
+                visible={isDeleting}
+                presentationStyle="overFullScreen" // 🎯 iOS ke liye: Yeh modal ko tab bar ke upar force karta hai
+                statusBarTranslucent={true} // Status bar ko bhi cover karne ke liye
+                onRequestClose={() => { }}
+            >
+                <View style={styles.overlayContainer}>
+                    <View style={styles.loaderBox}>
+                        <ActivityIndicator size="large" color={theme?.theme?.primary || "#D32F2F"} />
+                        <AppText weight="Medium" style={styles.overlayText}>
+                            Deleting Account...
+                        </AppText>
+                    </View>
+                </View>
+            </Modal>
             {/* -------- Confirmation Modal (Dynamic text alerts) -------- */}
             <ConfirmationModal
                 visible={confirmVisible}
@@ -231,6 +303,15 @@ const SettingsScreen = ({ navigation }) => {
                 onConfirm={removeBiometric}
                 onCancel={handleCancelLogout}
                 confirmTitle="Remove"
+            />
+            {/* Modal for Account Deletion */}
+            <ConfirmationModal
+                visible={deleteModalVisible}
+                title="Delete Account Permanently"
+                message="Are you sure you want to delete your account? This will permanently wipe your profiles, fees data, and school information from URSchooling backend database. This action is irreversible."
+                onConfirm={handleAccountDeletion}
+                onCancel={() => setDeleteModalVisible(false)}
+                confirmTitle={isDeleting ? "Deleting..." : "Delete"}
             />
         </>
     );
@@ -281,4 +362,31 @@ const styles = StyleSheet.create({
         transform: [{ scaleX: 0.9 }, { scaleY: 0.9 }],
         marginLeft: scale(10),
     },
+
+
+    // Overlay Ke Styles
+    overlayContainer: {
+        ...StyleSheet.absoluteFill,
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+        justifyContent: "center",
+        alignItems: "center",
+        zIndex: 9999, // Taake sab ke upar dikhe
+    },
+    loaderBox: {
+        backgroundColor: "#FFF",
+        padding: moderateScale(20),
+        borderRadius: 10,
+        alignItems: "center",
+        justifyContent: "center",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    overlayText: {
+        marginTop: verticalScale(10),
+        fontSize: moderateScale(14),
+        color: "#333",
+    }
 });

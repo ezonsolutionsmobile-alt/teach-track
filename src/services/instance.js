@@ -42,7 +42,6 @@ const createApi = (dynamicBaseURL) => {
   // ✅ RESPONSE INTERCEPTOR
   api.interceptors.response.use(
     async (response) => {
-      console.log(response.data,"response.dataresponse.dataresponse.dataresponse.data") 
       const logoutStore = useLogoutLockStore.getState();
       if (response.data?.status_code == 401 && !logoutStore?.logoutInProgress) {
         logoutStore.setLogoutLock(true);

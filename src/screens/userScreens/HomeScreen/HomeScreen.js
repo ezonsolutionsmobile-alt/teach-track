@@ -3,13 +3,13 @@ import { View, StyleSheet, FlatList, useWindowDimensions } from 'react-native';
 import CustomHeader from '../../../components/CustomHeader';
 import HomeCard from '../../../components/HomeCard';
 import MainBox from '../../../components/MainBox';
-import {  useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 import globalStyles from '../../../themes/globalStyles';
 import CustomStatusBar from '../../../components/CustomStatusBar';
 import { useScreenNavigationStore } from '../../../store/useScreenNavigationStore';
 import { useThemeStore } from '../../../store/useThemeStore';
 import { attendance, checkInOut, homework } from '../../../assets';
-import { scale } from '../../../themes/sizes';
+import { isTablet, scale, verticalScale } from '../../../themes/sizes';
 import { useTabStore } from '../../../store/useTabStore';
 import themes from '../../../themes/colors';
 
@@ -64,7 +64,7 @@ export default function HomeScreen() {
     setLastTopBarScreen(null);
     if (allowedTypes.includes(item?.type)) {
       setNavigationData(item?.type, item);
-    }else{
+    } else {
       setNavigationData(null, item);
     }
     setLastHomeScreen(item.url);
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   item: {
     flex: 1, // This is the key: every item (including spacers) takes equal width
     margin: 6, // Uniform gap between cards
-    height: scale(110), // Adjust height as per your card design
+    height: isTablet() ? verticalScale(70) : scale(110),
   },
   itemInvisible: {
     backgroundColor: 'transparent',

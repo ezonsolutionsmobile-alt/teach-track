@@ -2,7 +2,6 @@ import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { splashLogo } from '../assets';
-import { themeBaseURL } from "../services/baseUrls";
 
 const STORAGE_KEY = "APP_THEME_CONFIG";
 

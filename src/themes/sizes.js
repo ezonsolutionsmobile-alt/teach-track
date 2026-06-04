@@ -15,3 +15,10 @@ export const verticalScale = (size) => (height / guidelineBaseHeight) * size;
 // Moderate scaling (mix of horizontal + vertical)
 export const moderateScale = (size, factor = 0.5) =>
   size + (scale(size) - size) * factor;
+
+
+// Device check
+export const isTablet = () => {
+  const aspectRatio = height / width;
+  return width >= 768 && aspectRatio < 1.6;
+};
