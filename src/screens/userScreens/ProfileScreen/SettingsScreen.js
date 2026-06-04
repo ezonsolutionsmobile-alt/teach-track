@@ -16,6 +16,8 @@ import ConfirmationModal from '../../../components/Modals/ConfirmationModal';
 import globalStyles from "../../../themes/globalStyles";
 import { showToast } from "../../../components/ShowToas";
 import { useApiRoutesStore } from "../../../store/useApiRoutesStore";
+import { useAuthStore } from "../../../store/useAuthStore";
+import { DeactivateAccount } from '../../../services/removeAccount/removeAccountServices';
 
 export const STORAGE_KEY = "@quick_login_enabled_employee";
 export const APP_BIOMETRIC_KEY = "employeeAppBiometric";
@@ -30,7 +32,7 @@ const SettingsScreen = ({ navigation }) => {
     const [isDeleting, setIsDeleting] = useState(false)
     // 🔹 State dynamic labels ke liye
     const [biometryLabel, setBiometryLabel] = useState("Biometric Login");
-
+    const { logout } = useAuthStore();
     // 🔹 Load saved state (Biometric Status)
     useEffect(() => {
         const loadBiometricStatus = async () => {
@@ -121,8 +123,23 @@ const SettingsScreen = ({ navigation }) => {
         const { routes } = useApiRoutesStore.getState();
         try {
             setIsDeleting(true)
-            setDeleteModalVisible(false);
-            showToast('success', '', 'Account deletion requested successfully. You will be logged out now.');
+            const res = await DeactivateAccount();
+            if (res?.data?.status) {
+                setDeleteModalVisible(false);
+                console.log("Account deletion successful:", res.data);
+                showToast('success', '', 'Account deletion requested successfully. You will be logged out now.');
+                if (routes?.logout) {
+                    await logout(routes?.logout);
+                } else {
+                    // Fallback: Agar kisi wajah se route na mile toh direct local auth clear kardein
+                    const { clearLocalAuth } = useAuthStore.getState();
+                    await clearLocalAuth();
+                }
+            } else {
+                console.log("Account deletion failed:", res?.data);
+                showToast('error', '', 'Failed to request account deletion. Please try again later.');
+                return;
+            }
         } catch (error) {
             console.log("Account deletion error:", error);
             setDeleteModalVisible(false);
