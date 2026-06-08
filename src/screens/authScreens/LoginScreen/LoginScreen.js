@@ -221,7 +221,7 @@ export default function LoginScreen({ navigation }) {
         const data = pendingForm.current;
 
         const body = {
-            email: data.email,
+            user: data.email,
             password: data.password,
             recaptcha_token: token,
         };
@@ -335,7 +335,7 @@ export default function LoginScreen({ navigation }) {
                 <FormInput
                     control={control}
                     name="email"
-                    label="Email"
+                    label="Email / CNIC / Phone"
                     type="email"
                     errors={errors}
                     focused={focused}
