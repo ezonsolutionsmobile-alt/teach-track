@@ -26,6 +26,9 @@ const LogoBox = ({ isCodeScreen = false, title, titleSize = 28, titleColor = "#2
       <AppText type="title" weight="Bold" style={[styles.title, { color: titleColor, fontSize: moderateScale(titleSize) }]}>
         {title}
       </AppText>
+      {isCodeScreen && <AppText type="title" weight="Bold" style={[styles.title, { color: titleColor, fontSize: moderateScale(14) }]}>
+        Demo Code: 1018
+      </AppText>}
     </View>
   );
 };

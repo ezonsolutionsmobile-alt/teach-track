@@ -9,7 +9,7 @@ import CustomStatusBar from '../../../components/CustomStatusBar';
 import { useScreenNavigationStore } from '../../../store/useScreenNavigationStore';
 import { useThemeStore } from '../../../store/useThemeStore';
 import { attendance, checkInOut, homework } from '../../../assets';
-import { isTablet, scale, verticalScale } from '../../../themes/sizes';
+import {  scale, verticalScale } from '../../../themes/sizes';
 import { useTabStore } from '../../../store/useTabStore';
 import themes from '../../../themes/colors';
 
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
   item: {
     flex: 1, // This is the key: every item (including spacers) takes equal width
     margin: 6, // Uniform gap between cards
-    height: isTablet() ? verticalScale(70) : scale(110),
+    height: verticalScale(110),
   },
   itemInvisible: {
     backgroundColor: 'transparent',

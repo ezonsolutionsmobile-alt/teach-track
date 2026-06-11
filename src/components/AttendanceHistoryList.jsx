@@ -123,10 +123,10 @@ const AttendanceHistoryList = ({
                     <View style={styles.timeRow}>
                         <View>
                             <AppText weight="Medium" style={[styles.timeText, { color: "#50C878" }]}>
-                                {`In: ${CheckInOutTime(item?.last_check_in) ? item?.last_check_in : "--:--"}`}
+                                {`Check In: ${CheckInOutTime(item?.last_check_in) ? item?.last_check_in : "--:--"}`}
                             </AppText>
                             <AppText weight="Medium" style={[styles.timeText, { color: "red" }]}>
-                                {`Out: ${CheckInOutTime(item?.last_check_out) ? item?.last_check_out : "--:--"}`}
+                                {`Check Out: ${CheckInOutTime(item?.last_check_out) ? item?.last_check_out : "--:--"}`}
                             </AppText>
                         </View>
                         <EyeIcon width={18} height={18} stroke={3} color={theme?.theme?.primary} />
@@ -264,12 +264,12 @@ const styles = StyleSheet.create({
     infoSection: { flex: 1 },
     timeRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
     timeText: { fontSize: moderateScale(11) },
-    bottomSummary: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#333', paddingVertical: 10 },
+    bottomSummary: { position: 'absolute', bottom: 0, width: '100%', backgroundColor: '#333', paddingVertical: verticalScale(10) },
     summaryRow: { flexDirection: 'row', justifyContent: 'space-around' },
     summaryItem: { alignItems: 'center', width: width / 6 },
     dot: { width: 7, height: 7, borderRadius: 4, marginBottom: 2 },
     summaryIndex: { color: '#fff', fontSize: moderateScale(13) },
-    summaryStatus: { color: '#fff', fontSize: 7, textTransform: 'uppercase' }
+    summaryStatus: { color: '#fff', fontSize: moderateScale(7), textTransform: 'uppercase' }
 });
 
 export default AttendanceHistoryList;
