@@ -1,4 +1,4 @@
-import React, { use, useState } from 'react';
+import React  from 'react';
 import {
   View,
   Text,
@@ -29,6 +29,7 @@ import { attendance, checkInOut, homework,  } from '../../assets';
 import { useScreenNavigationStore } from '../../store/useScreenNavigationStore';
 import { moderateScale, verticalScale } from '../../themes/sizes';
 import AvatarInitials from '../../components/AvatarInitials';
+import APP_CONFIG from '../../config/app.config';
 
 export default function CustomDrawerContent({ navigation }) {
   const { assetRoutes, routes } = useApiRoutesStore()
@@ -202,7 +203,7 @@ export default function CustomDrawerContent({ navigation }) {
         </TouchableOpacity>
         {/* 👇 Version */}
         <AppText style={[styles.versionText, { fontSize: theme?.text_font_size?.medium_small }]} color={theme?.theme?.light_text}>
-          Version 2.0.0
+          Version {APP_CONFIG?.VERSION}
         </AppText>
       </View>
 

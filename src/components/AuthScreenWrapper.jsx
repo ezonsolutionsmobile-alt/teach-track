@@ -8,6 +8,7 @@ import CustomStatusBar from '../components/CustomStatusBar';
 import themes from '../themes/colors';
 import { scale } from '../themes/sizes';
 import AppText from './AppText';
+import APP_CONFIG from '../config/app.config';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -61,13 +62,13 @@ export default function AuthScreenWrapper({
                     keyboardShouldPersistTaps="handled"
                     showsVerticalScrollIndicator={false}
                     bounces={false}   // 🔥 iOS fix (important)
-                    overScrollMode="never" // Android stable
+                    overScrollMode="never"  
                 >
                     {children}
 
                 </KeyboardAwareScrollView>
                 <AppText style={[styles.versionText]} color="#fff">
-                    version 2.0.0
+                    version {APP_CONFIG?.VERSION}
                 </AppText>
             </View>
         </>
