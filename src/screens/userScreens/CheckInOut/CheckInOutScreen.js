@@ -20,6 +20,7 @@ import MonthYearPickerModal from '../../../components/MonthYearPickerModal';
 import Sound from 'react-native-sound';
 import { useTabStore } from '../../../store/useTabStore';
 import { DashedBorder } from '../../../assets/Icons';
+import { useSoundEffect } from '../../../hooks/useSoundEffect';
 
 const getDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371000;
@@ -31,8 +32,9 @@ const getDistance = (lat1, lon1, lat2, lon2) => {
 
 export default function CheckInOutScreen({ navigation }) {
     const { theme } = useThemeStore();
-    const submitSound = useRef(null);
-    const {  setLastHomeScreen, setActiveTab: setSideActiveTab } = useTabStore();
+
+    const playSuccessSound = useSoundEffect('send.wav');
+    const { setLastHomeScreen, setActiveTab: setSideActiveTab } = useTabStore();
 
     const [activeTab, setActiveTab] = useState('Check In/Out');
     const isFocused = useIsFocused();
@@ -210,7 +212,6 @@ export default function CheckInOutScreen({ navigation }) {
             longitude: userLocation?.lng,
             accuracy: userLocation?.accuracy,
         };
-
         try {
             setCheckInOutLoading(true);
 
@@ -222,14 +223,7 @@ export default function CheckInOutScreen({ navigation }) {
                     : "Check Out";
 
                 showToast("success", `${actionType} successful`);
-                submitSound.current?.stop(() => {
-                    submitSound.current?.setVolume(1.0);
-                    submitSound.current?.play((success) => {
-                        if (!success) {
-                            console.log("Playback failed");
-                        }
-                    });
-                });
+                playSuccessSound();
                 await getFenceAndLastCheckDetailsHandler();
             } else {
                 showToast("error", res?.message || "Action failed");
@@ -244,25 +238,6 @@ export default function CheckInOutScreen({ navigation }) {
     };
 
 
-    useEffect(() => {
-        Sound.setCategory('Playback');
-
-        submitSound.current = new Sound(
-            'send.wav',   //  ONLY filename
-            Sound.MAIN_BUNDLE,
-            (error) => {
-                if (error) {
-                    console.log('Sound load error:', error);
-                    return;
-                }
-                console.log('Sound loaded');
-            }
-        );
-
-        return () => {
-            submitSound.current?.release();
-        };
-    }, []);
 
     // 3. Memoized Map HTML
     const mapHtml = useMemo(() => `

@@ -1,7 +1,7 @@
 const APP_CONFIG = {
   APP_NAME: "Student Desk",
-  VERSION: "2.0.2",
-  BUILD_NUMBER: "3",
+  VERSION: "2.0.1",
+  BUILD_NUMBER: "10",
   
 //   API_BASE_URL: "https://api.yourapp.com",
   

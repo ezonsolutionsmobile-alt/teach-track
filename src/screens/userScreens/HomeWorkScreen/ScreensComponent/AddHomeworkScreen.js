@@ -26,11 +26,12 @@ import moment from 'moment';
 import useAcademicFlowStore from '../../../../store/useAcademicFlowStore';
 import { useTabStore } from '../../../../store/useTabStore';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
+import { useSoundEffect } from '../../../../hooks/useSoundEffect';
 export default function AddHomeworkScreen() {
-    const submitSound = useRef(null);
+
     const navigation = useNavigation();
     const { lastHomeScreen, lastTopBarScreen } = useTabStore();
-
+    const playSuccessSound = useSoundEffect('send.wav');
     // const { selectedSubject } = route.params || {};
     console.log(lastTopBarScreen, "lastTopBarScreenlastTopBarScreen")
     // Retrieve current app theme from Zustand global store
@@ -124,14 +125,7 @@ export default function AddHomeworkScreen() {
             const res = await addHomeWork(routes?.home_work_save, formData)
             if (res?.status) {
                 showToast("success", "", res?.message, theme?.set_timeout?.toast_message)
-                submitSound.current?.stop(() => {
-                    submitSound.current?.setVolume(1.0);
-                    submitSound.current?.play((success) => {
-                        if (!success) {
-                            console.log("Playback failed");
-                        }
-                    });
-                });
+                playSuccessSound();
                 setAttachment(null)
                 reset();
                 setIsUpdated(true)
@@ -195,25 +189,25 @@ export default function AddHomeworkScreen() {
         }
     }, [selectedSubject, isFocused])
 
-    useEffect(() => {
-        Sound.setCategory('Playback');
+    // useEffect(() => {
+    //     Sound.setCategory('Playback');
 
-        submitSound.current = new Sound(
-            'send.wav',   //  ONLY filename
-            Sound.MAIN_BUNDLE,
-            (error) => {
-                if (error) {
-                    console.log('Sound load error:', error);
-                    return;
-                }
-                console.log('Sound loaded');
-            }
-        );
+    //     submitSound.current = new Sound(
+    //         'send.wav',   //  ONLY filename
+    //         Sound.MAIN_BUNDLE,
+    //         (error) => {
+    //             if (error) {
+    //                 console.log('Sound load error:', error);
+    //                 return;
+    //             }
+    //             console.log('Sound loaded');
+    //         }
+    //     );
 
-        return () => {
-            submitSound.current?.release();
-        };
-    }, []);
+    //     return () => {
+    //         submitSound.current?.release();
+    //     };
+    // }, []);
 
     return (
         <>

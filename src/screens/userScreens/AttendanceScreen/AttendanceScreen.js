@@ -15,15 +15,16 @@ import { formatDate } from '../../../utils/formatDateType';
 import NoDataFound from '../../../components/NoDataFound';
 import { showToast } from '../../../components/ShowToas';
 import useAcademicFlowStore from '../../../store/useAcademicFlowStore';
+import { useSoundEffect } from '../../../hooks/useSoundEffect';
 
 
 export default function AttendanceScreen({ navigation, route }) {
   // Retrieve current app theme from Zustand global store
   const { theme } = useThemeStore();
-
+  const playSuccessSound = useSoundEffect('send.wav');
   const { sectionItem } = useAcademicFlowStore();
   const selectedDated = sectionItem?.selectedDated
- 
+
   const [attendanceType, setAttendanceType] = useState([])
   const [loader, setLoader] = useState(false)
 
@@ -112,6 +113,15 @@ export default function AttendanceScreen({ navigation, route }) {
       );
       return;
     }
+
+    if (!finalStudentsList || finalStudentsList.length === 0) {
+      showToast(
+        "error",
+        "Please update the attendance of at least one student before saving."
+      );
+      return;
+    }
+
     // If validation passed
     const now = new Date(selectedDated);
     const body = {
@@ -122,6 +132,8 @@ export default function AttendanceScreen({ navigation, route }) {
       date_id: now.getDate(),
       attendance_list: finalStudentsList
     }
+    console.log(body, "asdasd")
+
     try {
       setSubmitDisableLoader(true)
       setSaveLoader(true)
@@ -130,6 +142,7 @@ export default function AttendanceScreen({ navigation, route }) {
       if (res?.data?.status) {
         setFinalStudentsList([])
         showToast('success', '', res?.data?.message || 'Attendance Saved Successfully', theme?.set_timeout?.toast_message);
+        playSuccessSound();
         setTimeout(() => {
           navigation.goBack()
         }, theme?.set_timeout?.crud)
@@ -192,15 +205,15 @@ export default function AttendanceScreen({ navigation, route }) {
   }, [sectionItem])
 
 
-useFocusEffect(
-  React.useCallback(() => {
-    StatusBar.setHidden(true, 'fade');
+  useFocusEffect(
+    React.useCallback(() => {
+      StatusBar.setHidden(true, 'fade');
 
-    return () => {
-      StatusBar.setHidden(false, 'fade');
-    };
-  }, [])
-);
+      return () => {
+        StatusBar.setHidden(false, 'fade');
+      };
+    }, [])
+  );
 
   // Dynamic styles derived from theme configuration
   const attendanceHeaderWidth = theme?.attendance_screen?.attendance_header
