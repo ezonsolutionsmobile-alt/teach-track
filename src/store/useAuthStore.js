@@ -20,6 +20,7 @@ export const useAuthStore = create(
       user: null,
       isHydrated: false,
       isCodeScreen: false,
+      hasLoggedOut: false,
 
       // ✅ Login / Auth setter
       // setAuth: (token, user = null) =>
@@ -71,15 +72,9 @@ export const useAuthStore = create(
           // 2. Update Zustand state
           set({
             token: null,
+            hasLoggedOut: true,
           });
-          navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'HomeStack', // login screen stack
-              },
-            ],
-          });
+        
           // 3. Update AsyncStorage (persisted state)
           const stored = await AsyncStorage.getItem("auth-storage");
 

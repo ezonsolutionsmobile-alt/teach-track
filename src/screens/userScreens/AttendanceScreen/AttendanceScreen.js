@@ -132,13 +132,11 @@ export default function AttendanceScreen({ navigation, route }) {
       date_id: now.getDate(),
       attendance_list: finalStudentsList
     }
-    console.log(body, "asdasd")
 
     try {
       setSubmitDisableLoader(true)
       setSaveLoader(true)
       const res = await BulkStudentAttendanceSave(body)
-      console.log(res?.data, "res?.data?.statusres?.data?.status remove")
       if (res?.data?.status) {
         setFinalStudentsList([])
         showToast('success', '', res?.data?.message || 'Attendance Saved Successfully', theme?.set_timeout?.toast_message);

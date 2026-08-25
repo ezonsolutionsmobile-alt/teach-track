@@ -19,7 +19,7 @@ import TabsSkeleton from '../components/Skeletons/TabsSkeleton';
 import useAcademicFlowStore from '../store/useAcademicFlowStore';
 import { useTabStore } from '../store/useTabStore';
 import { BackHandler } from 'react-native';
-import { CommonActions, useFocusEffect, useNavigationState } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native';
 import { DashedBorder } from '../assets/Icons';
 
 const Stack = createNativeStackNavigator();

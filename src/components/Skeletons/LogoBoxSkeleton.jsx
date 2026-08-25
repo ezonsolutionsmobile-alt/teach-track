@@ -11,7 +11,7 @@ export default function LogoBoxSkeleton({ width = 180, height = 180 }) {
       <Skeleton
         width={scale(width)}
         height={verticalScale(height)}
-        borderRadius={scale(100)}
+        borderRadius={scale(width / 2)}
       style={{ marginBottom: verticalScale(32) }}
       />
 

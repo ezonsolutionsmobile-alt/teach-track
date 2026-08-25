@@ -17,6 +17,7 @@ import { useThemeStore } from '../../../store/useThemeStore';
 import ErrorModal from '../../../components/Modals/ErrorModal';
 import { showToast } from '../../../components/ShowToas';
 import Heading from '../../../components/GradientHeading';
+import APP_CONFIG from '../../../config/app.config';
 
 export default function ResetPasswordScreen({ navigation, route }) {
     const { otp } = route.params; // ✅ receive otp here
@@ -83,12 +84,12 @@ export default function ResetPasswordScreen({ navigation, route }) {
             />
 
             {/* <BrandLogo /> */}
-            <Heading title="EZONSOLUTION" />
+            <Heading title={APP_CONFIG?.companyName} />
 
             <MainBox style={{ marginTop: verticalScale(theme?.heading_font_size?.h3 - theme?.heading_font_size?.h5 || 6) }}>
 
                 {/* Logo + Title */}
-                <LogoBox title="Employee App"
+                <LogoBox title="EmployeeDesk"
                     titleSize={theme?.heading_font_size?.h1} titleColor={theme?.theme?.dark_text}
                     width={theme?.school_logo?.width} height={theme?.school_logo?.height} />
 

@@ -29,7 +29,7 @@ export default function ProfileScreen() {
 
   // Retrieve current app theme from Zustand global store
   const { theme } = useThemeStore();
-  const { activeTab, setActiveTab, lastHomeScreen, setLastHomeScreen } = useTabStore();
+  const { activeTab, setActiveTab, lastHomeScreen, setLastHomeScreen, setLastTopBarScreen } = useTabStore();
   // dynamic assets routes 
   const { assetRoutes, routes } = useApiRoutesStore()
 
@@ -115,7 +115,7 @@ export default function ProfileScreen() {
               }
               style={styles.avatar}
             /> */}
-               {user?.img && user?.img.trim() !== "" ? (
+            {user?.img && user?.img.trim() !== "" ? (
               <Image
                 source={{ uri: `${assetRoutes?.parent_images}/${user.img}` }}
                 style={styles.avatar}
@@ -169,7 +169,26 @@ export default function ProfileScreen() {
                 title={logoutLoader ? "Signing out..." : "Sign out"}
                 icon={<LogoutIcon color="red" />}
                 isLogout={true}
-                onPress={() => clearTokenOnly()} theme={theme}
+                onPress={() => {
+                  setLastTopBarScreen(null);
+                  navigation.getParent()?.reset({
+                    index: 0,
+                    routes: [
+                      {
+                        name: 'HomeStack',
+                        state: {
+                          index: 0,
+                          routes: [
+                            {
+                              name: 'HomeScreen',
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  });
+                  clearTokenOnly()
+                }} theme={theme}
               />
             </View>
             <MenuItem

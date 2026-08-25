@@ -19,6 +19,7 @@ import ErrorModal from '../../../components/Modals/ErrorModal';
 import Heading from '../../../components/GradientHeading';
 import { useApiRoutesStore } from '../../../store/useApiRoutesStore';
 import Recaptcha from 'react-native-recaptcha-that-works';
+import APP_CONFIG from '../../../config/app.config';
 
 export default function LoginScreenTest({ navigation }) {
     const { theme, fetchTheme } = useThemeStore();
@@ -91,7 +92,7 @@ export default function LoginScreenTest({ navigation }) {
             <ErrorModal visible={errorModal} onClose={() => setErrorModal(false)} message={errorMsg} />
 
             {/* Heading */}
-            <Heading title="EZONSOLUTION" />
+            <Heading title={APP_CONFIG?.companyName} />
 
             <MainBox style={{ marginTop: moderateScale(theme?.heading_font_size?.h3 - theme?.heading_font_size?.h5) }}>
                 {/* Logo + Title */}

@@ -17,6 +17,7 @@ import { ResetCodeGenerate } from '../../../services/auth/authService';
 import { showToast } from '../../../components/ShowToas';
 import Heading from '../../../components/GradientHeading';
 import { useFocusEffect } from '@react-navigation/native';
+import APP_CONFIG from '../../../config/app.config';
 
 export default function ForgotPasswordScreen({ navigation }) {
   // Retrieve current app theme from Zustand global store
@@ -67,10 +68,10 @@ useFocusEffect(
   return (
     <AuthScreenWrapper backgroundImage={bg_image} backgroundPattern={bg_pattern}>
       {/* <BrandLogo /> */}
-      <Heading title="EZONSOLUTION" />
+      <Heading title={APP_CONFIG?.companyName} />
       <MainBox paddingVertical={moderateScale(68)} style={{ marginTop: verticalScale(theme?.heading_font_size?.h3 - theme?.heading_font_size?.h5 || 6) }}>
         {/* Logo */}
-        <LogoBox title="Employee App"
+        <LogoBox title="EmployeeDesk"
           titleSize={theme?.heading_font_size?.h1} titleColor={theme?.theme?.dark_text}
           width={theme?.school_logo?.width} height={theme?.school_logo?.height} />
         {/* Title */}

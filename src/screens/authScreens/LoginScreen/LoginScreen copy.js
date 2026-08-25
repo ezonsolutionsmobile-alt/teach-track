@@ -19,6 +19,7 @@ import { useThemeStore } from '../../../store/useThemeStore';
 import ErrorModal from '../../../components/Modals/ErrorModal';
 import Heading from '../../../components/GradientHeading';
 import { useApiRoutesStore } from '../../../store/useApiRoutesStore';
+import APP_CONFIG from '../../../config/app.config';
 
 export default function LoginScreen({ navigation }) {
     // Retrieve current app theme from Zustand global store
@@ -67,7 +68,7 @@ export default function LoginScreen({ navigation }) {
             {/* error modal  */}
             <ErrorModal visible={errorModal} onClose={() => setErrorModal(false)} message={errorMsg} />
             {/* <BrandLogo /> */}
-            <Heading title="EZONSOLUTION" />
+            <Heading title={APP_CONFIG?.companyName} />
             <MainBox style={{ marginTop: moderateScale(theme?.heading_font_size?.h3 - theme?.heading_font_size?.h5) }}>
                 {/* Logo + Title */}
                 {!theme?.school_logo?.logo ?

@@ -2,21 +2,21 @@ import React from 'react';
 import { StyleSheet, View, Image } from 'react-native';
 import AppText from './AppText';
 import { moderateScale, scale, verticalScale } from '../themes/sizes';
-import themes from '../themes/colors';
 import { splashLogo } from '../assets';
 import { useApiRoutesStore } from '../store/useApiRoutesStore';
 import { useThemeStore } from '../store/useThemeStore';
 
-const LogoBox = ({ isCodeScreen = false, title, titleSize = 28, titleColor = "#292D34", width = 150, height = 150 }) => {
+const LogoBox = ({ isCodeScreen = false, appLogo = false, title, titleSize = 28, titleColor = "#292D34", width = 150, height = 150 }) => {
   // Retrieve current app theme from Zustand global store
   const { theme } = useThemeStore();
   const { assetRoutes } = useApiRoutesStore();
+  // console.log(theme?.school_logo?.logo,appLogo,isCodeScreen)
   return (
-    <View>
+    <View> 
       <Image
         // source={splashLogo}
         source={
-          !isCodeScreen && theme?.school_logo?.logo
+         !appLogo && theme?.school_logo?.logo
             ? { uri: assetRoutes?.logo + theme?.school_logo?.logo }
             : splashLogo
         }

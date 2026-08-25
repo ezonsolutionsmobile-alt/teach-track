@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Alert, Modal, Platform } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Alert, Modal, Platform, AppState } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -28,6 +28,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { APP_BIOMETRIC_KEY, STORAGE_KEY } from '../../userScreens/ProfileScreen/SettingsScreen';
 import { showToast } from '../../../components/ShowToas';
 import { useTabStore } from '../../../store/useTabStore';
+import APP_CONFIG from '../../../config/app.config';
 
 export default function LoginScreen({ navigation }) {
     const { theme, fetchTheme } = useThemeStore();
@@ -172,7 +173,7 @@ export default function LoginScreen({ navigation }) {
 
         pendingForm.current = data;
         recaptchaRef.current.open(); // shows reCAPTCHA checkbox
-        setCaptchaVisible(true)
+        // setCaptchaVisible(true)
 
         // const body = {
         //     email: data.email,
@@ -228,7 +229,7 @@ export default function LoginScreen({ navigation }) {
         try {
             setIsLoading(true)
             setIsDisable(true)
-            const res = await loginService(routes?.login, body);
+             const res = await loginService(routes?.login, body);
             if (res?.data?.status) {
                 await useAuthStore?.getState()?.clearKeychainData()
                 const { access_token, user_details } = res?.data;
@@ -303,16 +304,56 @@ export default function LoginScreen({ navigation }) {
         }
     };
 
+    // useEffect(() => {
+    //     const checkBiometric = async () => {
+    //         const isBiometric = await AsyncStorage.getItem(STORAGE_KEY);
+
+    //         if (isBiometric) {
+    //             handleBiometricLogin();
+    //         }
+    //     };
+
+    //     checkBiometric();
+    // }, []);
+
     useEffect(() => {
+        let appState = AppState.currentState;
+        let hasLoggedOut = useAuthStore.getState().hasLoggedOut;
         const checkBiometric = async () => {
             const isBiometric = await AsyncStorage.getItem(STORAGE_KEY);
 
-            if (isBiometric) {
-                handleBiometricLogin();
+            // Sirf tab login ho jab value strictly string 'true' ho
+            if (isBiometric === 'true' && !hasLoggedOut) {
+                await handleBiometricLogin();
             }
         };
-
+        // App launch
         checkBiometric();
+        // Background -> Foreground
+        const subscription = AppState.addEventListener('change', async (nextState) => {
+            // Background / Kill ke baad active
+            if (
+                appState.match(/inactive|background/) &&
+                nextState === 'active'
+            ) {
+                useAuthStore.setState({
+                    hasLoggedOut: false
+                });
+                const currentLogoutStatus = useAuthStore.getState().hasLoggedOut;
+                console.log(
+                    "App Active - Logout Status:",
+                    currentLogoutStatus
+                );
+
+                await checkBiometric();
+            }
+
+            appState = nextState;
+        });
+
+        return () => {
+            subscription.remove();
+        };
     }, []);
     return (
         <AuthScreenWrapper backgroundImage={bg_image} backgroundPattern={bg_pattern}>
@@ -320,13 +361,13 @@ export default function LoginScreen({ navigation }) {
             <ErrorModal visible={errorModal} onClose={() => setErrorModal(false)} message={errorMsg} />
 
             {/* Heading */}
-            <Heading title="EZONSOLUTION" />
+            <Heading title={APP_CONFIG?.companyName} />
 
             <MainBox style={{ marginTop: verticalScale(theme?.heading_font_size?.h3 - theme?.heading_font_size?.h5 || 6) }}>
                 {/* Logo + Title */}
                 {!theme?.school_logo?.logo ?
                     <LogoBoxSkeleton />
-                    : <LogoBox title="Employee App"
+                    : <LogoBox title="EmployeeDesk"
                         titleSize={theme?.heading_font_size?.h1} titleColor={theme?.theme?.dark_text}
                         width={theme?.school_logo?.width} height={theme?.school_logo?.height} />
                 }
@@ -388,9 +429,24 @@ export default function LoginScreen({ navigation }) {
             </MainBox>
 
             {/* reCAPTCHA v2 Component */}
-
-
             <Recaptcha
+                ref={recaptchaRef}
+                // siteKey="6Ldcu40tAAAAAKui-qhWR8LxOi4sfDaI13X4P7vJ"
+                siteKey={theme?.frontend_recaptcha_key}
+                baseUrl="https://urschooling.com"
+                size="invisible"
+                onVerify={(token) => {
+                    handleCaptchaVerify(token);
+                }}
+                onExpire={() => {
+                    console.log("⚠️ CAPTCHA EXPIRED");
+                }}
+                onError={(error) => {
+                    console.log("❌ CAPTCHA ERROR:", error);
+                }}
+            />
+
+            {/* <Recaptcha
                 ref={recaptchaRef}
                 siteKey={theme?.frontend_recaptcha_key} // replace with your actual site key
                 baseUrl="https://urschooling.com" // replace with your domain
@@ -431,7 +487,7 @@ export default function LoginScreen({ navigation }) {
                         </TouchableOpacity>
                     </View>
                 }
-            />
+            /> */}
             {/* Custom close button overlay */}
             {/* {captchaVisible && (
                 <Modal transparent animationType="fade">
