@@ -171,7 +171,48 @@ export const LogoutIcon = ({ width = 24, height = 24, color = 'black' }) => (
   </Svg>
 );
 
+// -------- Sync Icon --------
+export const SyncIcon = ({ width = 24, height = 24, color = 'black' }) => (
+  <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    {/* Sync Arrows */}
+    <Path
+      d="M20 11a8.1 8.1 0 0 0-14.8-4L3 10"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
 
+    <Path
+      d="M3 5v5h5"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    <Path
+      d="M4 13a8.1 8.1 0 0 0 14.8 4L21 14"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    <Path
+      d="M21 19v-5h-5"
+      stroke={color}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
 // -------- Menu / Hamburger Icon --------
 export const MenuIcon = ({ width = 24, height = 24, color = 'black' }) => (
   <Svg width={width} height={height} viewBox="0 0 24 24" fill="none">

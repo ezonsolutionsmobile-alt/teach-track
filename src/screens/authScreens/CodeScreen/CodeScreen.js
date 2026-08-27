@@ -25,7 +25,7 @@ import APP_CONFIG from '../../../config/app.config';
 export default function CodeScreen({ navigation }) {
     // Retrieve current app theme from Zustand global store
     const { theme, loadStoredTheme, fetchTheme, isThemeLoading } = useThemeStore();
-    const { setRoutes, setAssetRoutes } = useApiRoutesStore();
+    const { setRoutes, setAssetRoutes, setSchoolCode, setConfigUrl } = useApiRoutesStore();
 
     const [isDisable, setIsDisable] = useState(false);
 
@@ -48,6 +48,7 @@ export default function CodeScreen({ navigation }) {
         try {
             const res = await GetEmployeeAppRouteList({ code: data?.schoolCode })
             if (res?.data?.status) {
+                setSchoolCode(data?.schoolCode)
                 await clearLocalAuth()
                 await clearKeychainData()
                 const apiList = res?.data?.data?.api_list || [];
@@ -64,6 +65,7 @@ export default function CodeScreen({ navigation }) {
                     showToast("error", "Error", "Config URL not found");
                     return;
                 }
+                setConfigUrl(configUrl)
                 // 1️⃣ Load cache instantly
                 await loadStoredTheme();
                 await fetchTheme(configUrl);

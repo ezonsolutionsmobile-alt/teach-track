@@ -8,7 +8,11 @@ export const useApiRoutesStore = create(
       routes: {},
       assetRoutes: {},
       hasHydrated: false,
+      schoolCode: null,
+      configUrl: '',
 
+      setConfigUrl: (value) => set({ configUrl: value }),
+      setSchoolCode: (value) => set({ schoolCode: value }),
       setHasHydrated: (value) => set({ hasHydrated: value }),
 
       // 🔹 API Routes

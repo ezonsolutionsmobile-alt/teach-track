@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, StyleSheet, Image, TouchableOpacity, BackHandler, Platform } from "react-native";
 import CustomHeader from "../../../components/CustomHeader";
 import AppText from "../../../components/AppText";
@@ -14,6 +14,7 @@ import {
   ForwardIcon,
   ChangePasswordIcon,
   DashedBorder,
+  SyncIcon,
 } from "../../../assets/Icons";
 import { useAuthStore } from "../../../store/useAuthStore";
 import CustomStatusBar from "../../../components/CustomStatusBar";
@@ -22,19 +23,21 @@ import { useApiRoutesStore } from "../../../store/useApiRoutesStore";
 import { user_avatar } from "../../../assets";
 import { useTabStore } from "../../../store/useTabStore";
 import AvatarInitials from '../../../components/AvatarInitials';
+import { GetEmployeeAppRouteList } from "../../../services/global/codeService";
+import { showToast } from "../../../components/ShowToas";
 
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
 
   // Retrieve current app theme from Zustand global store
-  const { theme } = useThemeStore();
+  const { theme, loadStoredTheme, fetchTheme, } = useThemeStore();
   const { activeTab, setActiveTab, lastHomeScreen, setLastHomeScreen, setLastTopBarScreen } = useTabStore();
   // dynamic assets routes 
-  const { assetRoutes, routes } = useApiRoutesStore()
+  const { assetRoutes, routes, setRoutes, setAssetRoutes, schoolCode } = useApiRoutesStore()
 
   const { logout, user, logoutLoader, setAuth, clearTokenOnly } = useAuthStore();
-
+  const [syncLoader, setSyncLoader] = useState(false);
 
 
 
@@ -42,6 +45,55 @@ export default function ProfileScreen() {
   const updateTokenHandler = () => {
     setAuth("asdads", user)
   }
+
+  const syncHandler = async () => {
+    try {
+      setSyncLoader(true);
+
+      const res = await GetEmployeeAppRouteList({
+        code: schoolCode,
+      });
+
+      if (res?.data?.status) {
+        const apiList = res?.data?.data?.api_list || [];
+        const assetsApiList = res?.data?.data?.asset_list || [];
+        setAssetRoutes(assetsApiList)
+        setRoutes(apiList)
+        // Find object containing config api
+        const configObj = apiList.find(obj =>
+          obj?.get_employee_app_config_details
+        );
+        // Extract URL
+        const configUrl = configObj?.get_employee_app_config_details;
+        if (!configUrl) {
+          showToast("error", "Error", "Config URL not found");
+          return;
+        }
+        // 1️⃣ Load cache instantly
+        await loadStoredTheme();
+        await fetchTheme(configUrl);
+      } else {
+        showToast(
+          "error",
+          "Sync Failed",
+          res?.data?.message || "Unable to sync data"
+        );
+      }
+    } catch (error) {
+      console.log("Sync Error:", error);
+      showToast(
+        "error",
+        "Sync Failed",
+        error?.message || "Something went wrong while syncing"
+      );
+
+    } finally {
+      setSyncLoader(false);
+    }
+  };
+
+
+
 
   const handleBackAction = useCallback(() => {
     // navigation.getParent()?.navigate('HomeStack', {
@@ -165,6 +217,21 @@ export default function ProfileScreen() {
                 icon={<SettingsIcon color={theme?.theme?.medium_text} />}
                 onPress={() => navigation.navigate("SettingsScreen")} theme={theme}
               />
+              <MenuItem
+                title={syncLoader ? "Syncing..." : "Sync"}
+                icon={
+                  <SyncIcon
+                    color={theme?.theme?.medium_text}
+                    rotate={syncLoader}
+                  />
+                }
+                isLogout={true}
+                onPress={syncHandler}
+                theme={theme}
+              />
+
+
+              {/* logout functionality start  */}
               <MenuItem
                 title={logoutLoader ? "Signing out..." : "Sign out"}
                 icon={<LogoutIcon color="red" />}

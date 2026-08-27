@@ -31,7 +31,7 @@ import { useTabStore } from '../../../store/useTabStore';
 import APP_CONFIG from '../../../config/app.config';
 
 export default function LoginScreen({ navigation }) {
-    const { theme, fetchTheme } = useThemeStore();
+    const { theme, fetchTheme, loadStoredTheme } = useThemeStore();
     const { setActiveTab, setLastHomeScreen } = useTabStore();
     const [show, setShow] = useState({ password: false });
     const [focused, setFocused] = useState("");
@@ -41,7 +41,7 @@ export default function LoginScreen({ navigation }) {
     const [isLoading, setIsLoading] = useState(false);
     const [isDisable, setIsDisable] = useState(false);
 
-    const { routes } = useApiRoutesStore.getState();
+    const { routes, configUrl } = useApiRoutesStore.getState();
     const [captchaVisible, setCaptchaVisible] = useState(false);
     const pendingForm = useRef(null);
     const recaptchaRef = useRef(null);
@@ -229,7 +229,7 @@ export default function LoginScreen({ navigation }) {
         try {
             setIsLoading(true)
             setIsDisable(true)
-             const res = await loginService(routes?.login, body);
+            const res = await loginService(routes?.login, body);
             if (res?.data?.status) {
                 await useAuthStore?.getState()?.clearKeychainData()
                 const { access_token, user_details } = res?.data;
@@ -355,6 +355,19 @@ export default function LoginScreen({ navigation }) {
             subscription.remove();
         };
     }, []);
+
+
+    useEffect(() => {
+        const loadTheme = async () => {
+            // 1️⃣ Load cache instantly
+            await loadStoredTheme();
+
+            // 2️⃣ Fetch latest theme
+            await fetchTheme(configUrl);
+        };
+        loadTheme();
+    }, []);
+    
     return (
         <AuthScreenWrapper backgroundImage={bg_image} backgroundPattern={bg_pattern}>
             {/* Error Modal */}
