@@ -23,7 +23,7 @@ import { useApiRoutesStore } from "../../../store/useApiRoutesStore";
 import { user_avatar } from "../../../assets";
 import { useTabStore } from "../../../store/useTabStore";
 import AvatarInitials from '../../../components/AvatarInitials';
-import { GetEmployeeAppRouteList } from "../../../services/global/codeService";
+import { GetEmployeeAppRouteList, GetSchoolCode } from "../../../services/global/codeService";
 import { showToast } from "../../../components/ShowToas";
 
 
@@ -34,7 +34,7 @@ export default function ProfileScreen() {
   const { theme, loadStoredTheme, fetchTheme, } = useThemeStore();
   const { activeTab, setActiveTab, lastHomeScreen, setLastHomeScreen, setLastTopBarScreen } = useTabStore();
   // dynamic assets routes 
-  const { assetRoutes, routes, setRoutes, setAssetRoutes, schoolCode } = useApiRoutesStore()
+  const { assetRoutes, routes, setRoutes, setAssetRoutes, schoolCode, setSchoolCode } = useApiRoutesStore()
 
   const { logout, user, logoutLoader, setAuth, clearTokenOnly } = useAuthStore();
   const [syncLoader, setSyncLoader] = useState(false);
@@ -42,16 +42,25 @@ export default function ProfileScreen() {
 
 
   // Testing helper: Set an invalid token to verify logout / interceptor security flow
-  const updateTokenHandler = () => {
-    setAuth("asdads", user)
-  }
+  // const updateTokenHandler = () => {
+  //   setAuth("asdads", user)
+  // }
 
   const syncHandler = async () => {
+
     try {
       setSyncLoader(true);
-
+      const name = theme?.school_logo?.logo?.split('.')[0];
+      let updatedCode;
+      if (!schoolCode) {
+        const res = await GetSchoolCode(name)
+        if (res?.data?.status) {
+          setSchoolCode(res?.data?.code)
+          updatedCode = res?.data?.code
+        }
+      }
       const res = await GetEmployeeAppRouteList({
-        code: schoolCode,
+        code: schoolCode ? schoolCode : updatedCode,
       });
 
       if (res?.data?.status) {
@@ -225,8 +234,9 @@ export default function ProfileScreen() {
                     rotate={syncLoader}
                   />
                 }
+                loader={syncLoader}
                 isLogout={true}
-                onPress={syncHandler}
+                onPress={syncLoader ? () => { } : syncHandler}
                 theme={theme}
               />
 
@@ -256,6 +266,7 @@ export default function ProfileScreen() {
                   });
                   clearTokenOnly()
                 }} theme={theme}
+                loader={logoutLoader}
               />
             </View>
             <MenuItem
@@ -271,10 +282,10 @@ export default function ProfileScreen() {
     </>
   );
 }
-const MenuItem = ({ title, icon, isLogout = false, onPress, theme, isBorder = true }) => {
+const MenuItem = ({ title, icon,loader=false, isLogout = false, onPress, theme, isBorder = true }) => {
   return (
     <>
-      <TouchableOpacity style={[styles.menuItem, !isBorder && { borderBottomWidth: 0 }]} onPress={onPress}>
+      <TouchableOpacity disabled={loader} style={[styles.menuItem, !isBorder && { borderBottomWidth: 0 }]} onPress={onPress}>
         <View style={styles.leftRow}>
           {icon}
           <AppText style={[styles.menuText, { fontSize: moderateScale(theme?.text_font_size?.large) }]} color={theme?.theme?.dark_text}>

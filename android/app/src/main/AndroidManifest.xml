@@ -57,7 +57,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
         android:theme="@style/BootTheme"
-        android:usesCleartextTraffic="true"
+        android:usesCleartextTraffic="false"
         android:supportsRtl="true"
         android:enableOnBackInvokedCallback="false"
         android:requestLegacyExternalStorage="true">

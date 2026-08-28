@@ -2,12 +2,12 @@ const APP_CONFIG = {
   APP_NAME: "Student Desk",
 
   // android production
-  VERSION: "2.0.6",
-  BUILD_NUMBER: "7",
+  // VERSION: "2.0.7",
+  // BUILD_NUMBER: "8",
 
   // ios production
-  // VERSION: "2.0.5",
-  // BUILD_NUMBER: "14",
+  VERSION: "2.0.7",
+  BUILD_NUMBER: "16",
 
 
 

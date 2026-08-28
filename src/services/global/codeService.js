@@ -9,3 +9,12 @@ export const GetEmployeeAppRouteList = async (body) => {
         console.error(error);
     }
 };
+
+export const GetSchoolCode = async (name) => {
+    try {
+        const response = await globalApi.get(`https://urschooling.com/sms_global/public/api/get_school_code/${name}`);
+        return response
+    } catch (error) {
+        console.error(error);
+    }
+};
