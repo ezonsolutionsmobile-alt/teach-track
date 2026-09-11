@@ -1,13 +1,17 @@
 const APP_CONFIG = {
-  APP_NAME: "Student Desk",
+  APP_NAME: "employeedesk",
 
   // android production
-  // VERSION: "2.0.7",
-  // BUILD_NUMBER: "8",
+  VERSION: "2.1.3",
+  BUILD_NUMBER: "13",
+  PLATFORM: "android",
+
+
 
   // ios production
-  VERSION: "2.0.7",
-  BUILD_NUMBER: "16",
+  // VERSION: "2.1.0",
+  // BUILD_NUMBER: "19",
+  // PLATFORM: "ios",
 
 
 
@@ -19,7 +23,7 @@ const APP_CONFIG = {
     BIOMETRIC_LOGIN: true,
     NOTIFICATIONS: true,
   },
-  companyName:"EZONSOLUTIONS"
+  companyName: "EZONSOLUTIONS"
 };
 
 export default APP_CONFIG;

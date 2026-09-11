@@ -1,4 +1,4 @@
-import React  from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ import { useTabStore } from '../../store/useTabStore';
 import { useApiRoutesStore } from '../../store/useApiRoutesStore';
 import AppText from '../../components/AppText';
 import { useThemeStore } from '../../store/useThemeStore';
-import { attendance, checkInOut, homework,  } from '../../assets';
+import { attendance, checkInOut, homework, } from '../../assets';
 import { useScreenNavigationStore } from '../../store/useScreenNavigationStore';
 import { moderateScale, verticalScale } from '../../themes/sizes';
 import AvatarInitials from '../../components/AvatarInitials';
@@ -38,7 +38,7 @@ export default function CustomDrawerContent({ navigation }) {
   const { theme } = useThemeStore();
   const { setNavigationData, itemData } = useScreenNavigationStore();
   const { setActiveTab, setLastHomeScreen, activeTab, lastHomeScreen, setLastTopBarScreen } = useTabStore();
-
+  const [imageError, setImageError] = useState(false);
   const activeRoute = useNavigationState((state) => {
     const drawer = state.routes[state.index];
     const tab = drawer.state?.routes[drawer.state.index];
@@ -109,10 +109,12 @@ export default function CustomDrawerContent({ navigation }) {
           }
           style={styles.avatar}
         /> */}
-        {user?.img && user?.img.trim() !== "" ? (
+        {user?.img && user?.img.trim() !== "" && !imageError ? (
           <Image
-            source={{ uri: `${assetRoutes?.parent_images}/${user.img}` }}
+            source={{ uri: `${assetRoutes?.employee_images}/${user.img}` }}
             style={styles.avatar}
+            onError={() => setImageError(true)} // Jab image load nahi hogi, yeh state true ho jaye gi
+
           />
         ) : (
           <AvatarInitials

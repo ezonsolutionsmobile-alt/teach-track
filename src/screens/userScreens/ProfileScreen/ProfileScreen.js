@@ -20,7 +20,6 @@ import { useAuthStore } from "../../../store/useAuthStore";
 import CustomStatusBar from "../../../components/CustomStatusBar";
 import { useThemeStore } from "../../../store/useThemeStore";
 import { useApiRoutesStore } from "../../../store/useApiRoutesStore";
-import { user_avatar } from "../../../assets";
 import { useTabStore } from "../../../store/useTabStore";
 import AvatarInitials from '../../../components/AvatarInitials';
 import { GetEmployeeAppRouteList, GetSchoolCode } from "../../../services/global/codeService";
@@ -32,13 +31,13 @@ export default function ProfileScreen() {
 
   // Retrieve current app theme from Zustand global store
   const { theme, loadStoredTheme, fetchTheme, } = useThemeStore();
-  const { activeTab, setActiveTab, lastHomeScreen, setLastHomeScreen, setLastTopBarScreen } = useTabStore();
+  const {  setActiveTab, setLastHomeScreen, setLastTopBarScreen } = useTabStore();
   // dynamic assets routes 
   const { assetRoutes, routes, setRoutes, setAssetRoutes, schoolCode, setSchoolCode } = useApiRoutesStore()
 
-  const { logout, user, logoutLoader, setAuth, clearTokenOnly } = useAuthStore();
+  const { logout, user, logoutLoader,  clearTokenOnly } = useAuthStore();
   const [syncLoader, setSyncLoader] = useState(false);
-
+  const [imageError, setImageError] = useState(false);
 
 
   // Testing helper: Set an invalid token to verify logout / interceptor security flow
@@ -133,7 +132,6 @@ export default function ProfileScreen() {
       if (e.data.action.type === 'RESET' || e.data.action.type === 'NAVIGATE') {
         return;
       }
-
       // Swipe back gesture ko prevent karo
       e.preventDefault();
 
@@ -176,10 +174,11 @@ export default function ProfileScreen() {
               }
               style={styles.avatar}
             /> */}
-            {user?.img && user?.img.trim() !== "" ? (
+            {user?.img && user?.img.trim() !== "" && !imageError ? (
               <Image
-                source={{ uri: `${assetRoutes?.parent_images}/${user.img}` }}
+                source={{ uri: `${assetRoutes?.employee_images}/${user.img}` }}
                 style={styles.avatar}
+                onError={() => setImageError(true)} // Jab image load nahi hogi, yeh state true ho jaye gi
               />
             ) : (
               <AvatarInitials
@@ -282,7 +281,7 @@ export default function ProfileScreen() {
     </>
   );
 }
-const MenuItem = ({ title, icon,loader=false, isLogout = false, onPress, theme, isBorder = true }) => {
+const MenuItem = ({ title, icon, loader = false, isLogout = false, onPress, theme, isBorder = true }) => {
   return (
     <>
       <TouchableOpacity disabled={loader} style={[styles.menuItem, !isBorder && { borderBottomWidth: 0 }]} onPress={onPress}>

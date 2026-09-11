@@ -33,8 +33,8 @@ export default function AddHomeworkScreen() {
     const { lastHomeScreen, lastTopBarScreen } = useTabStore();
     const playSuccessSound = useSoundEffect('send.wav');
     // const { selectedSubject } = route.params || {};
-    console.log(lastTopBarScreen, "lastTopBarScreenlastTopBarScreen")
-    // Retrieve current app theme from Zustand global store
+    // console.log(lastTopBarScreen, "lastTopBarScreenlastTopBarScreen")
+    // Retrieve current app theme from Zustand global store 
     const { theme } = useThemeStore();
     // global routes 
     const { routes } = useApiRoutesStore.getState();
@@ -145,7 +145,7 @@ export default function AddHomeworkScreen() {
     // ✅ Measure remaining space
     const onLayoutContainer = (event) => {
         const containerHeight = event.nativeEvent.layout.height;
-        console.log(containerHeight)
+        // console.log(containerHeight)
         const headerHeight = 180; // approximate header + top texts
         const tabsHeight = 0;
         const dropdownHeight = 0;

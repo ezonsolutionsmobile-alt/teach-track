@@ -144,6 +144,69 @@ export const ProfileIcon = ({ width = 24, height = 24, color = 'black' }) => (
   </Svg>
 );
 
+export const UpdateIcon = ({
+  width = 52,
+  height = 52,
+  color = '#17A2B8',
+}) => (
+  <Svg
+    width={width}
+    height={height}
+    viewBox="0 0 24 24"
+    fill="none"
+  >
+    {/* Circular update arrow */}
+    <Path
+      d="M20 11A8.1 8.1 0 0 0 5.5 6.5L4 8"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    <Path
+      d="M4 4V8H8"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    <Path
+      d="M4 13A8.1 8.1 0 0 0 18.5 17.5L20 16"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    <Path
+      d="M20 20V16H16"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    {/* Up arrow */}
+    <Path
+      d="M12 17V8"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    <Path
+      d="M8.5 11.5L12 8L15.5 11.5"
+      stroke={color}
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </Svg>
+);
+
 // -------- Logout Icon --------
 export const LogoutIcon = ({ width = 24, height = 24, color = 'black' }) => (
   <Svg

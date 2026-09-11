@@ -2,9 +2,11 @@ import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { splashLogo } from '../assets';
+import APP_CONFIG from "../config/app.config";
+import { app_version_url } from "../services/baseUrls";
 
 const STORAGE_KEY = "APP_THEME_CONFIG";
-
+const APP_VERSION_STORAGE_KEY = "APP_VERSION_CONFIG";
 export const useThemeStore = create((set, get) => ({
 
     // 🟣 DEFAULT (offline safe)
@@ -24,6 +26,13 @@ export const useThemeStore = create((set, get) => ({
             medium_text: "#6B6B6B"
         },
     },
+
+    appVersion: null,
+    isAppVersionLoading: false,
+
+    setAppVersionLoading: (value) =>
+        set({ isAppVersionLoading: value }),
+
     isThemeLoading: false,
     setThemeLoading: (value) => set({ isThemeLoading: value }),
     // 🟣 SET THEME
@@ -75,5 +84,68 @@ export const useThemeStore = create((set, get) => ({
     colors: () => {
         const state = get();
         return state.theme?.colors || {};
+    },
+
+
+     fetchAppVersion: async () => {
+        get().setAppVersionLoading(true);
+
+        try {
+            const formData = new FormData();
+
+            formData.append("app_name", APP_CONFIG?.APP_NAME);
+            formData.append("platform_name", APP_CONFIG?.PLATFORM);
+
+            const res = await axios.post(
+                app_version_url,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                    },
+                }
+            );
+
+            console.log("📱 App Version API:", res?.data);
+
+            const versionData = res?.data?.data;
+
+            if (!versionData) return;
+
+            set({
+                appVersion: versionData
+            });
+
+            await AsyncStorage.setItem(
+                APP_VERSION_STORAGE_KEY,
+                JSON.stringify(versionData)
+            );
+        } catch (err) {
+            console.log(
+                "App Version API Error:",
+                err?.response?.data || err.message
+            );
+        } finally {
+            get().setAppVersionLoading(false);
+        }
+    },
+
+    loadStoredAppVersion: async () => {
+        try {
+            const stored = await AsyncStorage.getItem(
+                APP_VERSION_STORAGE_KEY
+            );
+
+            if (stored) {
+                set({
+                    appVersion: JSON.parse(stored)
+                });
+            }
+        } catch (e) {
+            console.log(
+                "App Version Storage Load Error:",
+                e
+            );
+        }
     },
 }));

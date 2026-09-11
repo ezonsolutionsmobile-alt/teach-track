@@ -64,7 +64,7 @@ export default function CancelledHomework() {
         }
     };
 
-    console.log(pageCancelled, "pageCancelledpageCancelled")
+    // console.log(pageCancelled, "pageCancelledpageCancelled")
     /* ---------- Load More data---------- */
     const loadMore = async () => {
         if (cancelledWorkLoading) return;

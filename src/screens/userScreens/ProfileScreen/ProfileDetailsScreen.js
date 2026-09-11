@@ -37,9 +37,9 @@ export default function ProfileDetailsScreen() {
 
   const { getProfile, profile, loading } = useUserStore()
   const { user } = useAuthStore();
-
+  const [imageError, setImageError] = useState(false);
   // global routes 
-  const { routes } = useApiRoutesStore.getState();
+  const { routes, assetRoutes } = useApiRoutesStore.getState();
 
   // This state is used to control the pull-to-refresh loading indicator on the screen
   const [refreshing, setRefreshing] = useState(false);
@@ -72,7 +72,7 @@ export default function ProfileDetailsScreen() {
       fetchData();
     }
   }, [profile]);
-
+  console.log(user, "useruseruser", assetRoutes)
   return (
     <>
       {/* <OrientationLocker orientation={PORTRAIT} /> */}
@@ -96,20 +96,21 @@ export default function ProfileDetailsScreen() {
 
         {/* Fixed Profile Card */}
         <View style={styles.profileCard}>
-            {user?.img && user?.img.trim() !== "" ? (
-              <Image
-                source={{ uri: `${assetRoutes?.parent_images}/${user.img}` }}
-                style={styles.avatar}
-              />
-            ) : (
-              <AvatarInitials
-                firstName={user?.f_name}
-                lastName={user?.l_name}
-                theme={theme}
-                avatarStyle={styles.avatar}
-                borderColor={theme?.theme?.primary}
-              />
-            )}
+          {user?.img && user?.img.trim() !== "" && !imageError ? (
+            <Image
+              source={{ uri: `${assetRoutes?.employee_images}/${user.img}` }}
+              style={styles.avatar}
+              onError={() => setImageError(true)} // Jab image load nahi hogi, yeh state true ho jaye gi 
+            />
+          ) : (
+            <AvatarInitials
+              firstName={user?.f_name}
+              lastName={user?.l_name}
+              theme={theme}
+              avatarStyle={styles.avatar}
+              borderColor={theme?.theme?.primary}
+            />
+          )}
           <View>
             <AppText weight="Bold" style={{ textTransform: 'capitalize', fontSize: moderateScale(theme?.text_font_size?.large) }} color={theme?.theme?.dark_Text}>
               {user?.f_name} {user?.l_name}

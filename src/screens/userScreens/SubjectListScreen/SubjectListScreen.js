@@ -79,11 +79,10 @@ export default function SubjectListScreen({ route }) {
     }, [navigation]);
 
 
-    const routeName = useNavigationState(state => {
-        const route = state.routes[state.index];
-        console.log(state.routes, '  subjectScreen');
-        return route.name;
-    });
+    // const routeName = useNavigationState(state => {
+    //     const route = state.routes[state.index];
+    //     return route.name;
+    // }); 
 
     return (
         <>

@@ -17,7 +17,7 @@ export const useSoundEffect = (soundFileName) => {
                     console.log('Sound load error:', error);
                     return;
                 }
-                console.log('Sound loaded successfully:', soundFileName);
+                // console.log('Sound loaded successfully:', soundFileName);
             }
         );
 
